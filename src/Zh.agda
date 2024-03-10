@@ -75,3 +75,19 @@ cohℤω zero             = refl
 cohℤω (strpos n)       = refl
 cohℤω (strneg zero)    = refl
 cohℤω (strneg (suc n)) = refl
+
+-- Conversions between the two type definitions
+ℤₕ-to-ℤω : ℤₕ → ℤω
+ℤₕ-to-ℤω zero          = zero
+ℤₕ-to-ℤω (succ n)      = succℤω (ℤₕ-to-ℤω n)
+ℤₕ-to-ℤω (pred n)      = predℤω (ℤₕ-to-ℤω n)
+ℤₕ-to-ℤω (sec n i)     = secℤω (ℤₕ-to-ℤω n) i
+ℤₕ-to-ℤω (ret n i)     = retℤω (ℤₕ-to-ℤω n) i
+ℤₕ-to-ℤω (coh n i₁ i₂) = cohℤω (ℤₕ-to-ℤω n) i₁ i₂ -- How does coherence have type of ℤₕ?
+
+ℤω-to-ℤₕ : ℤω → ℤₕ
+ℤω-to-ℤₕ zero             = zero
+ℤω-to-ℤₕ (strpos zero)    = succ zero
+ℤω-to-ℤₕ (strpos (suc n)) = succ (ℤω-to-ℤₕ (strpos n))
+ℤω-to-ℤₕ (strneg zero)    = pred zero
+ℤω-to-ℤₕ (strneg (suc n)) = pred (ℤω-to-ℤₕ (strneg n))
