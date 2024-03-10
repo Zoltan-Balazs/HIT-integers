@@ -40,6 +40,31 @@ sec a i * b     = {!   !}
 ret a i * b     = {!   !}
 coh a i₁ i₂ * b = {!   !}
 
+-- Properties needed for HIT Integers to form a Commutative Ring
+-- Is it an Abelian Group under addition?
+ℤₕ-add-is-assoc : (a : ℤₕ) → (b : ℤₕ) → (c : ℤₕ) → (a + b) + c ≡ a + (b + c)
+ℤₕ-add-is-assoc a b c = {!   !}
+
+-- ℤₕ-add-has-id-elem :
+-- ℤₕ-add-has-inv-elem :
+
+ℤₕ-add-is-comm : (a : ℤₕ) → (b : ℤₕ) → a + b ≡ b + a
+ℤₕ-add-is-comm a b = {!   !}
+
+-- Is it a Monoid under multiplication?
+ℤₕ-mul-is-assoc : (a : ℤₕ) → (b : ℤₕ) → (c : ℤₕ) → (a * b) * c ≡ a * (b * c)
+ℤₕ-mul-is-assoc a b c = {!   !}
+
+-- ℤₕ-mul-has-id-elem :
+
+-- Is this multiplication distributive over addition?
+ℤₕ-mul-is-dist-to-add : (a : ℤₕ) → (b : ℤₕ) → (c : ℤₕ) → a * (b + c) ≡ (a * b) + (a * c)
+ℤₕ-mul-is-dist-to-add a b c = {!   !}
+
+-- Is multiplication communative?
+ℤₕ-mul-is-comm : (a : ℤₕ) → (b : ℤₕ) → a * b ≡ b * a
+ℤₕ-mul-is-comm a b = {!   !}
+
 -- Inductive type definition of ℤ
 data ℤω : Set where
     zero : ℤω
