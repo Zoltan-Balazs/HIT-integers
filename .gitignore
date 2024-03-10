@@ -1,0 +1,9 @@
+*.agdai
+references/
+
+thesis/*
+!thesis/thesis.pdf
+!thesis/thesis.tex
+!thesis/elteikthesis*
+!thesis/images/
+!thesis/sections/
