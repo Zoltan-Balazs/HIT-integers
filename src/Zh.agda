@@ -1,6 +1,7 @@
 {-# OPTIONS --cubical #-}
 
 open import Cubical.Foundations.Prelude renaming (congS to ap)
+open import Cubical.Data.Nat hiding (_+_)
 
 -- Higher inductive type definition of ℤ
 data ℤₕ : Set where
@@ -38,3 +39,39 @@ pred a * b      = a * b - b
 sec a i * b     = {!   !}
 ret a i * b     = {!   !}
 coh a i₁ i₂ * b = {!   !}
+
+-- Inductive type definition of ℤ
+data ℤω : Set where
+    zero : ℤω
+    strpos : ℕ → ℤω
+    strneg : ℕ → ℤω
+
+succℤω : ℤω → ℤω
+succℤω zero             = strpos zero
+succℤω (strpos n)       = strpos (suc n)
+succℤω (strneg zero)    = zero
+succℤω (strneg (suc n)) = strneg n
+
+predℤω : ℤω → ℤω
+predℤω zero             = strneg zero
+predℤω (strpos zero)    = zero
+predℤω (strpos (suc n)) = strpos n
+predℤω (strneg n)       = strneg (suc n)
+
+secℤω : (z : ℤω) → predℤω (succℤω z) ≡ z
+secℤω zero             = refl
+secℤω (strpos n)       = refl
+secℤω (strneg zero)    = refl
+secℤω (strneg (suc n)) = refl
+
+retℤω : (z : ℤω) → succℤω (predℤω z) ≡ z
+retℤω zero             = refl
+retℤω (strpos zero)    = refl
+retℤω (strpos (suc n)) = refl
+retℤω (strneg n)       = refl
+
+cohℤω : (z : ℤω) → ap succℤω (secℤω z) ≡ retℤω (succℤω z)
+cohℤω zero             = refl
+cohℤω (strpos n)       = refl
+cohℤω (strneg zero)    = refl
+cohℤω (strneg (suc n)) = refl
