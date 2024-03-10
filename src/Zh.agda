@@ -61,7 +61,7 @@ coh a i₁ i₂ * b = {!   !}
 ℤₕ-mul-is-dist-to-add : (a : ℤₕ) → (b : ℤₕ) → (c : ℤₕ) → a * (b + c) ≡ (a * b) + (a * c)
 ℤₕ-mul-is-dist-to-add a b c = {!   !}
 
--- Is multiplication communative?
+-- Is multiplication commutative?
 ℤₕ-mul-is-comm : (a : ℤₕ) → (b : ℤₕ) → a * b ≡ b * a
 ℤₕ-mul-is-comm a b = {!   !}
 
@@ -108,7 +108,7 @@ cohℤω (strneg (suc n)) = refl
 ℤₕ-to-ℤω (pred n)      = predℤω (ℤₕ-to-ℤω n)
 ℤₕ-to-ℤω (sec n i)     = secℤω (ℤₕ-to-ℤω n) i
 ℤₕ-to-ℤω (ret n i)     = retℤω (ℤₕ-to-ℤω n) i
-ℤₕ-to-ℤω (coh n i₁ i₂) = cohℤω (ℤₕ-to-ℤω n) i₁ i₂ -- How does coherence have type of ℤₕ?
+ℤₕ-to-ℤω (coh n i₁ i₂) = cohℤω (ℤₕ-to-ℤω n) i₁ i₂
 
 ℤω-to-ℤₕ : ℤω → ℤₕ
 ℤω-to-ℤₕ zero             = zero
