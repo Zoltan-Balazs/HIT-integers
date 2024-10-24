@@ -249,8 +249,22 @@ isMonoidℤₕ* .IsMonoid.·IdR = ℤₕ-mul-right-id
 isMonoidℤₕ* .IsMonoid.·IdL = ℤₕ-mul-left-id
 
 -- Is this multiplication distributive over addition?
-ℤₕ-mul-is-dist-to-add : (a : ℤₕ) → (b : ℤₕ) → (c : ℤₕ) → a * (b + c) ≡ (a * b) + (a * c)
-ℤₕ-mul-is-dist-to-add a b c = {!   !}
+ℤₕ-mul-is-right-dist-to-add : (a b c : ℤₕ) → a * (b + c) ≡ (a * b) + (a * c)
+ℤₕ-mul-is-right-dist-to-add zero b c = refl
+ℤₕ-mul-is-right-dist-to-add (succ a) b c = {!   !}
+ℤₕ-mul-is-right-dist-to-add (pred a) b c = {!   !}
+ℤₕ-mul-is-right-dist-to-add (sec a i) b c = {!   !}
+ℤₕ-mul-is-right-dist-to-add (ret a i) b c = {!   !}
+ℤₕ-mul-is-right-dist-to-add (coh a i j) b c = {!   !}
+
+ℤₕ-mul-is-left-dist-to-add : (a b c : ℤₕ) → (a + b) * c ≡ (a * c) + (b * c)
+ℤₕ-mul-is-left-dist-to-add a b zero = {!   !}
+ℤₕ-mul-is-left-dist-to-add a b (succ c) = {!   !}
+ℤₕ-mul-is-left-dist-to-add a b (pred c) = {!   !}
+ℤₕ-mul-is-left-dist-to-add a b (sec c i) = {!   !}
+ℤₕ-mul-is-left-dist-to-add a b (ret c i) = {!   !}
+ℤₕ-mul-is-left-dist-to-add a b (coh c i j) = {!   !}
+
 
 -- Is multiplication commutative?
 ℤₕ-mul-is-comm : (a : ℤₕ) → (b : ℤₕ) → a * b ≡ b * a
