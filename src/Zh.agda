@@ -24,6 +24,13 @@ data ℤₕ : Set where
     coh : (z : ℤₕ) → ap succ (sec z) ≡ ret (succ z)
 
 open isHAEquiv
+
+succ-inj : (a b : ℤₕ) → succ a ≡ succ b → a ≡ b
+succ-inj a b eq = sym (sec a) ∙ ap pred eq ∙ sec b
+
+pred-inj : (a b : ℤₕ) → pred a ≡ pred b → a ≡ b
+pred-inj a b eq = sym (ret a) ∙ ap succ eq ∙ ret b
+
 isHAℤₕ : isHAEquiv succ
 isHAℤₕ .isHAEquiv.g    = pred
 isHAℤₕ .isHAEquiv.linv = sec
