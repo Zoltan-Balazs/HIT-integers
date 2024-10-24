@@ -1,6 +1,7 @@
 {-# OPTIONS --cubical #-}
 
 open import Cubical.Data.Int.MoreInts.BiInvInt renaming (pred to predᵇ; _+_ to _+ᵇ_; _-_ to _-ᵇ_)
+open import Cubical.Data.Sigma
 open import Cubical.Foundations.Equiv.HalfAdjoint
 open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Prelude renaming (congS to ap)
@@ -108,6 +109,25 @@ a - b = a + negate b
 ℤₕ-add-is-assoc (sec a i)   b c = ap (λ k → sec k i) (ℤₕ-add-is-assoc a b c)
 ℤₕ-add-is-assoc (ret a i)   b c = ap (λ k → ret k i) (ℤₕ-add-is-assoc a b c)
 ℤₕ-add-is-assoc (coh a i j) b c = ap (λ k → coh k i j) (ℤₕ-add-is-assoc a b c)
+
+-- Helping lemma for ℤₕ-add-has-right-id-elem
+ℤₕ-add-right-id : (a : ℤₕ) → a + zero ≡ a
+ℤₕ-add-right-id zero = refl
+ℤₕ-add-right-id (succ a) = ap succ (ℤₕ-add-right-id a)
+ℤₕ-add-right-id (pred a) = ap pred (ℤₕ-add-right-id a)
+ℤₕ-add-right-id (sec a i) = ap (λ k → sec k i) (ℤₕ-add-right-id a)
+ℤₕ-add-right-id (ret a i) = ap (λ k → ret k i) (ℤₕ-add-right-id a)
+ℤₕ-add-right-id (coh a i j) = ap (λ k → coh k i j) (ℤₕ-add-right-id a)
+
+ℤₕ-add-has-right-id-elem : ∃[ b ∈ ℤₕ ] ((a : ℤₕ) → a + b ≡ a)
+ℤₕ-add-has-right-id-elem = ∣ zero , ℤₕ-add-right-id ∣₁
+
+-- Helping lemma for ℤₕ-add-has-left-id-elem
+ℤₕ-add-left-id : (a : ℤₕ) → zero + a ≡ a
+ℤₕ-add-left-id a = refl
+
+ℤₕ-add-has-left-id-elem : ∃[ b ∈ ℤₕ ] ((a : ℤₕ) → b + a ≡ a)
+ℤₕ-add-has-left-id-elem = ∣ zero , ℤₕ-add-left-id ∣₁
 
 -- Is it a Monoid under multiplication?
 ℤₕ-mul-is-assoc : (a : ℤₕ) → (b : ℤₕ) → (c : ℤₕ) → (a * b) * c ≡ a * (b * c)
