@@ -276,7 +276,7 @@ isRingℤₕ .IsRing.·DistR+ = ℤₕ-mul-is-right-dist-to-add
 isRingℤₕ .IsRing.·DistL+ = ℤₕ-mul-is-left-dist-to-add
 
 -- Is multiplication commutative?
-ℤₕ-mul-is-comm : (a : ℤₕ) → (b : ℤₕ) → a * b ≡ b * a
+ℤₕ-mul-is-comm : (a b : ℤₕ) → a * b ≡ b * a
 ℤₕ-mul-is-comm a b = {!   !}
 
 isCommRingℤₕ : IsCommRing {lzero} {ℤₕ} zero (succ zero) _+_ _*_ negate
