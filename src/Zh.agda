@@ -2,6 +2,7 @@
 
 open import Agda.Primitive
 open import Cubical.Algebra.AbGroup
+open import Cubical.Algebra.Monoid
 open import Cubical.Data.Int.MoreInts.BiInvInt renaming (pred to predᵇ; _+_ to _+ᵇ_; _-_ to _-ᵇ_)
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Equiv.HalfAdjoint
@@ -233,6 +234,11 @@ coh a i j * b = {! ((ℤₕ-add-is-assoc (a * b) b (negate b) ∙ ap (λ k → a
 ℤₕ-mul-has-left-id-elem : ∃[ b ∈ ℤₕ ] ((a : ℤₕ) → b * a ≡ a)
 ℤₕ-mul-has-left-id-elem = ∣ succ zero , ℤₕ-mul-left-id ∣₁
 
+isMonoidℤₕ* : IsMonoid {lzero} {ℤₕ} (succ zero) _*_
+isMonoidℤₕ* .IsMonoid.isSemigroup .IsSemigroup.is-set = isSetℤₕ
+isMonoidℤₕ* .IsMonoid.isSemigroup .IsSemigroup.·Assoc = λ x y z → sym (ℤₕ-mul-is-assoc x y z)
+isMonoidℤₕ* .IsMonoid.·IdR = ℤₕ-mul-right-id
+isMonoidℤₕ* .IsMonoid.·IdL = ℤₕ-mul-left-id
 
 -- Is this multiplication distributive over addition?
 ℤₕ-mul-is-dist-to-add : (a : ℤₕ) → (b : ℤₕ) → (c : ℤₕ) → a * (b + c) ≡ (a * b) + (a * c)
