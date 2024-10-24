@@ -88,21 +88,16 @@ sec a i   + b = sec (a + b) i
 ret a i   + b = ret (a + b) i
 coh a i j + b = coh (a + b) i j
 
-_-_ : ℤₕ → ℤₕ → ℤₕ
-a - zero        = a
-a - succ b      = pred (a - b)
-a - pred b      = succ (a - b)
-a - sec b i     = ret (a - b) i
-a - ret b i     = sec (a - b) i
-a - coh b i₁ i₂ = {!   !}
+negate : ℤₕ → ℤₕ
+negate zero        = zero
+negate (succ z)    = pred (negate z)
+negate (pred z)    = succ (negate z)
+negate (sec z i)   = ret (negate z) i
+negate (ret z i)   = sec (negate z) i
+negate (coh z i j) = hoc (negate z) i j
 
-_*_ : ℤₕ → ℤₕ → ℤₕ
-zero * b        = zero
-succ a * b      = a * b + b
-pred a * b      = a * b - b
-sec a i * b     = {!   !}
-ret a i * b     = {!   !}
-coh a i₁ i₂ * b = {!   !}
+_-_ : ℤₕ → ℤₕ → ℤₕ
+a - b = a + negate b
 
 -- Properties needed for HIT Integers to form a Commutative Ring
 -- Is it an Abelian Group under addition?
