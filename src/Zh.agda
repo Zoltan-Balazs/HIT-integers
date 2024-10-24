@@ -100,6 +100,30 @@ negate (coh z i j) = hoc (negate z) i j
 _-_ : ℤₕ → ℤₕ → ℤₕ
 a - b = a + negate b
 
+sucr+ : (a b : ℤₕ) → a + succ b ≡ succ (a + b)
+sucr+ zero        b = refl
+sucr+ (succ a)    b = ap succ (sucr+ a b)
+sucr+ (pred a)    b = ap pred (sucr+ a b) ∙ sec (a + b) ∙ sym (ret (a + b))
+sucr+ (sec a i)   b = {! ap (λ k → sec k i) (sucr+ a b)!}
+sucr+ (ret a i)   b = {!   !}
+sucr+ (coh a i j) b = {!   !}
+
+predr+ : (a b : ℤₕ) → a + pred b ≡ pred (a + b)
+predr+ zero        b = refl
+predr+ (succ a)    b = ap succ (predr+ a b) ∙ ret (a + b) ∙ sym (sec (a + b))
+predr+ (pred a)    b = ap pred (predr+ a b)
+predr+ (sec a i)   b = {!   !}
+predr+ (ret a i)   b = {!   !}
+predr+ (coh a i j) b = {!   !}
+
+inv-additivity : (z : ℤₕ) → z - z ≡ zero
+inv-additivity zero        = refl
+inv-additivity (succ z)    = ap succ (predr+ z (negate z)) ∙ ret (z - z) ∙ inv-additivity z
+inv-additivity (pred z)    = ap pred (sucr+ z (negate z)) ∙ sec (z - z) ∙ inv-additivity z
+inv-additivity (sec z i)   = {!   !}
+inv-additivity (ret z i)   = {!   !}
+inv-additivity (coh z i j) = {!   !}
+
 -- Properties needed for HIT Integers to form a Commutative Ring
 -- Is it an Abelian Group under addition?
 ℤₕ-add-is-assoc : (a b c : ℤₕ) → (a + b) + c ≡ a + (b + c)
