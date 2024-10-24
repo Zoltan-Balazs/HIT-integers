@@ -81,12 +81,12 @@ infixl 6 _+_ _-_
 infixl 7 _*_
 
 _+_ : ℤₕ → ℤₕ → ℤₕ
-zero        + b = b
-succ a      + b = succ (a + b)
-pred a      + b = pred (a + b)
-sec a i     + b = sec (a + b) i
-ret a i     + b = ret (a + b) i
-coh a i₁ i₂ + b = coh (a + b) i₁ i₂
+zero      + b = b
+succ a    + b = succ (a + b)
+pred a    + b = pred (a + b)
+sec a i   + b = sec (a + b) i
+ret a i   + b = ret (a + b) i
+coh a i j + b = coh (a + b) i j
 
 _-_ : ℤₕ → ℤₕ → ℤₕ
 a - zero        = a
