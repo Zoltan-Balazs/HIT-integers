@@ -101,14 +101,13 @@ a - b = a + negate b
 
 -- Properties needed for HIT Integers to form a Commutative Ring
 -- Is it an Abelian Group under addition?
-ℤₕ-add-is-assoc : (a : ℤₕ) → (b : ℤₕ) → (c : ℤₕ) → (a + b) + c ≡ a + (b + c)
-ℤₕ-add-is-assoc a b c = {!   !}
-
--- ℤₕ-add-has-id-elem :
--- ℤₕ-add-has-inv-elem :
-
-ℤₕ-add-is-comm : (a : ℤₕ) → (b : ℤₕ) → a + b ≡ b + a
-ℤₕ-add-is-comm a b = {!   !}
+ℤₕ-add-is-assoc : (a b c : ℤₕ) → (a + b) + c ≡ a + (b + c)
+ℤₕ-add-is-assoc zero        b c = refl
+ℤₕ-add-is-assoc (succ a)    b c = ap succ (ℤₕ-add-is-assoc a b c)
+ℤₕ-add-is-assoc (pred a)    b c = ap pred (ℤₕ-add-is-assoc a b c)
+ℤₕ-add-is-assoc (sec a i)   b c = ap (λ k → sec k i) (ℤₕ-add-is-assoc a b c)
+ℤₕ-add-is-assoc (ret a i)   b c = ap (λ k → ret k i) (ℤₕ-add-is-assoc a b c)
+ℤₕ-add-is-assoc (coh a i j) b c = ap (λ k → coh k i j) (ℤₕ-add-is-assoc a b c)
 
 -- Is it a Monoid under multiplication?
 ℤₕ-mul-is-assoc : (a : ℤₕ) → (b : ℤₕ) → (c : ℤₕ) → (a * b) * c ≡ a * (b * c)
