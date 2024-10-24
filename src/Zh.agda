@@ -1,8 +1,10 @@
 {-# OPTIONS --cubical #-}
 
+open import Cubical.Data.Int.MoreInts.BiInvInt renaming (pred to predᵇ; _+_ to _+ᵇ_; _-_ to _-ᵇ_)
 open import Cubical.Foundations.Equiv.HalfAdjoint
+open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Prelude renaming (congS to ap)
-open import Cubical.Data.Nat hiding (_+_)
+open import Cubical.HITs.PropositionalTruncation
 
 -- Higher inductive type definition of ℤ
 data ℤₕ : Set where
@@ -22,6 +24,58 @@ isHAℤₕ .isHAEquiv.com  = coh
 
 hoc : (z : ℤₕ) → ap pred (ret z) ≡ sec (pred z)
 hoc = com-op isHAℤₕ
+ℤₕ-to-BiInvℤ : ℤₕ → BiInvℤ
+ℤₕ-to-BiInvℤ zero        = zero
+ℤₕ-to-BiInvℤ (succ z)    = suc (ℤₕ-to-BiInvℤ z)
+ℤₕ-to-BiInvℤ (pred z)    = predl (ℤₕ-to-BiInvℤ z)
+ℤₕ-to-BiInvℤ (sec z i)   = predl-suc (ℤₕ-to-BiInvℤ z) i
+ℤₕ-to-BiInvℤ (ret z i)   = suc-predl (ℤₕ-to-BiInvℤ z) i
+ℤₕ-to-BiInvℤ (coh z i j) = isSetBiInvℤ
+                (suc (predl (suc (ℤₕ-to-BiInvℤ z)))) 
+                (suc (ℤₕ-to-BiInvℤ z))
+                (ap suc (predl-suc (ℤₕ-to-BiInvℤ z))) 
+                (suc-predl (suc (ℤₕ-to-BiInvℤ z)))
+                i j
+
+BiInvℤ-to-ℤₕ : BiInvℤ → ℤₕ
+BiInvℤ-to-ℤₕ zero            = zero
+BiInvℤ-to-ℤₕ (suc z)         = succ (BiInvℤ-to-ℤₕ z)
+BiInvℤ-to-ℤₕ (predr z)       = pred (BiInvℤ-to-ℤₕ z)
+BiInvℤ-to-ℤₕ (suc-predr z i) = ret (BiInvℤ-to-ℤₕ z) i
+BiInvℤ-to-ℤₕ (predl z)       = pred (BiInvℤ-to-ℤₕ z)
+BiInvℤ-to-ℤₕ (predl-suc z i) = sec (BiInvℤ-to-ℤₕ z) i
+
+ℤₕ-BiInvℤ-ℤₕ : (z : ℤₕ) -> BiInvℤ-to-ℤₕ (ℤₕ-to-BiInvℤ z) ≡ z
+ℤₕ-BiInvℤ-ℤₕ zero = refl
+ℤₕ-BiInvℤ-ℤₕ (succ z) = ap succ (ℤₕ-BiInvℤ-ℤₕ z)
+ℤₕ-BiInvℤ-ℤₕ (pred z) = ap pred (ℤₕ-BiInvℤ-ℤₕ z)
+ℤₕ-BiInvℤ-ℤₕ (sec z i) = ap (λ k → sec k i) (ℤₕ-BiInvℤ-ℤₕ z)
+ℤₕ-BiInvℤ-ℤₕ (ret z i) = {!  ap (λ k → ret k i) (ℤₕ-BiInvℤ-ℤₕ z) !}
+ℤₕ-BiInvℤ-ℤₕ (coh z i j) = {! ap (λ k → coh k i j) (ℤₕ-BiInvℤ-ℤₕ z)  !}
+
+BiInv-predl≡predr : predl ≡ predr
+BiInv-predl≡predr = funExt predl≡predr
+
+BiInvℤ-ℤₕ-BiInvℤ : (z : BiInvℤ) -> ℤₕ-to-BiInvℤ (BiInvℤ-to-ℤₕ z) ≡ z
+BiInvℤ-ℤₕ-BiInvℤ zero = refl
+BiInvℤ-ℤₕ-BiInvℤ (suc z) = ap suc (BiInvℤ-ℤₕ-BiInvℤ z)
+BiInvℤ-ℤₕ-BiInvℤ (predr z) = ap (λ f → f (ℤₕ-to-BiInvℤ (BiInvℤ-to-ℤₕ z))) BiInv-predl≡predr ∙ ap predr (BiInvℤ-ℤₕ-BiInvℤ z)
+BiInvℤ-ℤₕ-BiInvℤ (suc-predr z i) = {! ap (λ k → suc-predl≡predr k i) (BiInvℤ-ℤₕ-BiInvℤ z)  !}
+BiInvℤ-ℤₕ-BiInvℤ (predl z) = ap predl (BiInvℤ-ℤₕ-BiInvℤ z)
+BiInvℤ-ℤₕ-BiInvℤ (predl-suc z i) = ap (λ k → predl-suc k i) (BiInvℤ-ℤₕ-BiInvℤ z)
+
+biinv-iso : Iso ℤₕ BiInvℤ
+biinv-iso .Iso.fun      = ℤₕ-to-BiInvℤ
+biinv-iso .Iso.inv      = BiInvℤ-to-ℤₕ
+biinv-iso .Iso.rightInv = BiInvℤ-ℤₕ-BiInvℤ
+biinv-iso .Iso.leftInv  = ℤₕ-BiInvℤ-ℤₕ
+
+BiInvℤ≡ℤₕ : BiInvℤ ≡ ℤₕ
+BiInvℤ≡ℤₕ = isoToPath (iso BiInvℤ-to-ℤₕ ℤₕ-to-BiInvℤ ℤₕ-BiInvℤ-ℤₕ BiInvℤ-ℤₕ-BiInvℤ)
+
+isSetℤₕ : isSet ℤₕ
+isSetℤₕ = subst isSet BiInvℤ≡ℤₕ isSetBiInvℤ
+
 -- Operations of HIT Integers
 infixl 6 _+_ _-_
 infixl 7 _*_
