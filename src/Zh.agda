@@ -1,5 +1,7 @@
 {-# OPTIONS --cubical #-}
 
+open import Agda.Primitive
+open import Cubical.Algebra.AbGroup
 open import Cubical.Data.Int.MoreInts.BiInvInt renaming (pred to predᵇ; _+_ to _+ᵇ_; _-_ to _-ᵇ_)
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Equiv.HalfAdjoint
@@ -193,6 +195,15 @@ inv-additivity (coh z i j) = {!   !}
 ℤₕ-add-is-comm (sec a i) b = {!   ap (λ k → sec k i) (ℤₕ-add-is-comm a b) !}
 ℤₕ-add-is-comm (ret a i) b = {!   !}
 ℤₕ-add-is-comm (coh a i j) b = {!   !}
+
+isAbGroupℤₕ+ : IsAbGroup {lzero} {ℤₕ} zero _+_ negate
+isAbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.isMonoid .IsMonoid.isSemigroup .IsSemigroup.is-set = isSetℤₕ
+isAbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.isMonoid .IsMonoid.isSemigroup .IsSemigroup.·Assoc = λ x y z → sym (ℤₕ-add-is-assoc x y z)
+isAbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.isMonoid .IsMonoid.·IdR = ℤₕ-add-right-id
+isAbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.isMonoid .IsMonoid.·IdL = ℤₕ-add-left-id
+isAbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.·InvR = ℤₕ-add-has-right-inv-elem
+isAbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.·InvL = ℤₕ-add-has-left-inv-elem
+isAbGroupℤₕ+ .IsAbGroup.+Comm = ℤₕ-add-is-comm
 
 -- Is it a Monoid under multiplication?
 ℤₕ-mul-is-assoc : (a : ℤₕ) → (b : ℤₕ) → (c : ℤₕ) → (a * b) * c ≡ a * (b * c)
