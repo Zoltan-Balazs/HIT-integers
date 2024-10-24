@@ -129,6 +129,22 @@ a - b = a + negate b
 ℤₕ-add-has-left-id-elem : ∃[ b ∈ ℤₕ ] ((a : ℤₕ) → b + a ≡ a)
 ℤₕ-add-has-left-id-elem = ∣ zero , ℤₕ-add-left-id ∣₁
 
+ℤₕ-add-has-right-inv-elem : (a : ℤₕ) → a + negate a ≡ zero
+ℤₕ-add-has-right-inv-elem zero = refl
+ℤₕ-add-has-right-inv-elem (succ a) = {!!}
+ℤₕ-add-has-right-inv-elem (pred a) = {!!}
+ℤₕ-add-has-right-inv-elem (sec a i) = {!!}
+ℤₕ-add-has-right-inv-elem (ret a i) = {!!}
+ℤₕ-add-has-right-inv-elem (coh a i j) = {!!}
+
+ℤₕ-add-has-left-inv-elem : (a : ℤₕ) → negate a + a ≡ zero
+ℤₕ-add-has-left-inv-elem zero = refl
+ℤₕ-add-has-left-inv-elem (succ a) = {! sym (predr+ (negate a) (succ a)) ∙ ℤₕ-add-has-left-inv-elem (sec a)!}
+ℤₕ-add-has-left-inv-elem (pred a) = {!!}
+ℤₕ-add-has-left-inv-elem (sec a i) = {!!}
+ℤₕ-add-has-left-inv-elem (ret a i) = {!!}
+ℤₕ-add-has-left-inv-elem (coh a i j) = {!!}
+
 -- Is it a Monoid under multiplication?
 ℤₕ-mul-is-assoc : (a : ℤₕ) → (b : ℤₕ) → (c : ℤₕ) → (a * b) * c ≡ a * (b * c)
 ℤₕ-mul-is-assoc a b c = {!   !}
