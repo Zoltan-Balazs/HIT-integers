@@ -9,6 +9,7 @@ open import Cubical.Algebra.Ring
 open import Cubical.Algebra.Semigroup
 open import Cubical.Data.Int renaming (_+_ to _+ᶻ_; _-_ to _-ᶻ_)
 open import Cubical.Data.Int.MoreInts.BiInvInt renaming (pred to predᵇ; _+_ to _+ᵇ_; _-_ to _-ᵇ_)
+open import Cubical.Data.Nat hiding (_+_)
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Equiv.HalfAdjoint
 open import Cubical.Foundations.Isomorphism
@@ -319,6 +320,22 @@ isRingℤₕ .IsRing.·DistL+ = ℤₕ-mul-is-left-dist-to-add
 isCommRingℤₕ : IsCommRing {lzero} {ℤₕ} zero (succ zero) _+_ _*_ negate
 isCommRingℤₕ .IsCommRing.isRing = isRingℤₕ
 isCommRingℤₕ .IsCommRing.·Comm = ℤₕ-mul-is-comm
+
+infixl 7 _^^_
+
+_^^_ : ℤₕ → ℕ → ℤₕ
+zero ^^ zero = succ zero
+zero ^^ suc b = zero
+succ a ^^ zero = succ zero
+succ a ^^ suc b = (succ a) * (succ a ^^ b)
+pred a ^^ zero = succ zero
+pred a ^^ suc b =  (pred a) * (pred a ^^ b)
+sec a i ^^ zero = {!sec (succ zero) i!}
+sec a i ^^ suc b = {! sec (a * (a ^^ b)) i!}
+ret a i ^^ zero = {! ret (succ zero) i!}
+ret a i ^^ suc b = {! ret (a * (a ^^ b)) i!}
+coh a i j ^^ zero = {! coh (succ zero) i j!}
+coh a i j ^^ suc b = {! coh (a * (a ^^ b)) i j!}
 
 -- Inductive type definition of ℤ
 data ℤω : Set where
