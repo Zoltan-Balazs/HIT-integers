@@ -169,6 +169,31 @@ inv-additivity (coh z i j) = {!   !}
 ℤₕ-add-has-left-inv-elem (ret a i) = {!!}
 ℤₕ-add-has-left-inv-elem (coh a i j) = {!!}
 
+-- Helping lemmas for ℤₕ-add-is-comm
+ℤₕ-add-comm-succ-helper : (a b : ℤₕ) → succ a + b ≡ a + succ b
+ℤₕ-add-comm-succ-helper zero b = refl
+ℤₕ-add-comm-succ-helper (succ a) b = ap succ (ℤₕ-add-comm-succ-helper a b)
+ℤₕ-add-comm-succ-helper (pred a) b = ret (a + b) ∙ sym (sec (a + b)) ∙ ap pred (ℤₕ-add-comm-succ-helper a b)
+ℤₕ-add-comm-succ-helper (sec a i) b = {!   !}
+ℤₕ-add-comm-succ-helper (ret a i) b = {!   !}
+ℤₕ-add-comm-succ-helper (coh a i j) b = {!   !}
+
+ℤₕ-add-comm-pred-helper : (a b : ℤₕ) → pred a + b ≡ a + pred b
+ℤₕ-add-comm-pred-helper zero b = refl
+ℤₕ-add-comm-pred-helper (succ a) b = sec (a + b) ∙ sym (ret (a + b)) ∙ ap succ (ℤₕ-add-comm-pred-helper a b)
+ℤₕ-add-comm-pred-helper (pred a) b = ap pred (ℤₕ-add-comm-pred-helper a b)
+ℤₕ-add-comm-pred-helper (sec a i) b = {!   !}
+ℤₕ-add-comm-pred-helper (ret a i) b = {!   !}
+ℤₕ-add-comm-pred-helper (coh a i j) b = {!   !}
+
+ℤₕ-add-is-comm : (a b : ℤₕ) → a + b ≡ b + a
+ℤₕ-add-is-comm zero b = sym (ℤₕ-add-right-id b)
+ℤₕ-add-is-comm (succ a) b = ap succ (ℤₕ-add-is-comm a b) ∙ ℤₕ-add-comm-succ-helper b a
+ℤₕ-add-is-comm (pred a) b = ap pred (ℤₕ-add-is-comm a b) ∙ ℤₕ-add-comm-pred-helper b a
+ℤₕ-add-is-comm (sec a i) b = {!   ap (λ k → sec k i) (ℤₕ-add-is-comm a b) !}
+ℤₕ-add-is-comm (ret a i) b = {!   !}
+ℤₕ-add-is-comm (coh a i j) b = {!   !}
+
 -- Is it a Monoid under multiplication?
 ℤₕ-mul-is-assoc : (a : ℤₕ) → (b : ℤₕ) → (c : ℤₕ) → (a * b) * c ≡ a * (b * c)
 ℤₕ-mul-is-assoc a b c = {!   !}
