@@ -2,7 +2,10 @@
 
 open import Agda.Primitive
 open import Cubical.Algebra.AbGroup
+open import Cubical.Algebra.Group
 open import Cubical.Algebra.Monoid
+open import Cubical.Algebra.Ring
+open import Cubical.Algebra.Semigroup
 open import Cubical.Data.Int.MoreInts.BiInvInt renaming (pred to predᵇ; _+_ to _+ᵇ_; _-_ to _-ᵇ_)
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Equiv.HalfAdjoint
@@ -265,6 +268,11 @@ isMonoidℤₕ* .IsMonoid.·IdL = ℤₕ-mul-left-id
 ℤₕ-mul-is-left-dist-to-add a b (ret c i) = {!   !}
 ℤₕ-mul-is-left-dist-to-add a b (coh c i j) = {!   !}
 
+isRingℤₕ : IsRing {lzero} {ℤₕ} zero (succ zero) _+_ _*_ negate
+isRingℤₕ .IsRing.+IsAbGroup = isAbGroupℤₕ+
+isRingℤₕ .IsRing.·IsMonoid = isMonoidℤₕ*
+isRingℤₕ .IsRing.·DistR+ = ℤₕ-mul-is-right-dist-to-add
+isRingℤₕ .IsRing.·DistL+ = ℤₕ-mul-is-left-dist-to-add
 
 -- Is multiplication commutative?
 ℤₕ-mul-is-comm : (a : ℤₕ) → (b : ℤₕ) → a * b ≡ b * a
