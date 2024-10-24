@@ -2,6 +2,7 @@
 
 open import Agda.Primitive
 open import Cubical.Algebra.AbGroup
+open import Cubical.Algebra.CommRing
 open import Cubical.Algebra.Group
 open import Cubical.Algebra.Monoid
 open import Cubical.Algebra.Ring
@@ -277,6 +278,10 @@ isRingℤₕ .IsRing.·DistL+ = ℤₕ-mul-is-left-dist-to-add
 -- Is multiplication commutative?
 ℤₕ-mul-is-comm : (a : ℤₕ) → (b : ℤₕ) → a * b ≡ b * a
 ℤₕ-mul-is-comm a b = {!   !}
+
+isCommRingℤₕ : IsCommRing {lzero} {ℤₕ} zero (succ zero) _+_ _*_ negate
+isCommRingℤₕ .IsCommRing.isRing = isRingℤₕ
+isCommRingℤₕ .IsCommRing.·Comm = ℤₕ-mul-is-comm
 
 -- Inductive type definition of ℤ
 data ℤω : Set where
