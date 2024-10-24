@@ -214,10 +214,25 @@ ret a i   * b = ((ℤₕ-add-is-assoc (a * b) (negate b) b ∙ ap (λ k → a * 
 coh a i j * b = {! ((ℤₕ-add-is-assoc (a * b) b (negate b) ∙ ap (λ k → a * b + k) (ℤₕ-add-has-right-inv-elem b)) ∙ ℤₕ-add-right-id (a * b)) i!}
 
 -- Is it a Monoid under multiplication?
-ℤₕ-mul-is-assoc : (a : ℤₕ) → (b : ℤₕ) → (c : ℤₕ) → (a * b) * c ≡ a * (b * c)
-ℤₕ-mul-is-assoc a b c = {!   !}
+-- Helping lemma for ℤₕ-mul-has-right-id-elem
+ℤₕ-mul-right-id : (a : ℤₕ) → a * succ zero ≡ a
+ℤₕ-mul-right-id zero = refl
+ℤₕ-mul-right-id (succ a) = ap (λ k → k + succ zero) (ℤₕ-mul-right-id a) ∙ ℤₕ-add-is-comm a (succ zero)
+ℤₕ-mul-right-id (pred a) = ap (λ k → k - succ zero) (ℤₕ-mul-right-id a) ∙ ℤₕ-add-is-comm a (pred zero)
+ℤₕ-mul-right-id (sec a i) = {!  ap (λ k → sec k i) (ℤₕ-mul-right-id a) !}
+ℤₕ-mul-right-id (ret a i) = {!   !}
+ℤₕ-mul-right-id (coh a i i₁) = {!   !}
 
--- ℤₕ-mul-has-id-elem :
+ℤₕ-mul-has-right-id-elem : ∃[ b ∈ ℤₕ ] ((a : ℤₕ) → a * b ≡ a)
+ℤₕ-mul-has-right-id-elem = ∣ succ zero , ℤₕ-mul-right-id ∣₁
+
+-- Helping lemma for ℤₕ-mul-has-left-id-elem
+ℤₕ-mul-left-id : (a : ℤₕ) → succ zero * a ≡ a
+ℤₕ-mul-left-id a = refl
+
+ℤₕ-mul-has-left-id-elem : ∃[ b ∈ ℤₕ ] ((a : ℤₕ) → b * a ≡ a)
+ℤₕ-mul-has-left-id-elem = ∣ succ zero , ℤₕ-mul-left-id ∣₁
+
 
 -- Is this multiplication distributive over addition?
 ℤₕ-mul-is-dist-to-add : (a : ℤₕ) → (b : ℤₕ) → (c : ℤₕ) → a * (b + c) ≡ (a * b) + (a * c)
