@@ -1,5 +1,6 @@
 {-# OPTIONS --cubical #-}
 
+open import Cubical.Foundations.Equiv.HalfAdjoint
 open import Cubical.Foundations.Prelude renaming (congS to ap)
 open import Cubical.Data.Nat hiding (_+_)
 
@@ -12,6 +13,15 @@ data ℤₕ : Set where
     ret : (z : ℤₕ) → succ (pred z) ≡ z
     coh : (z : ℤₕ) → ap succ (sec z) ≡ ret (succ z)
 
+open isHAEquiv
+isHAℤₕ : isHAEquiv succ
+isHAℤₕ .isHAEquiv.g    = pred
+isHAℤₕ .isHAEquiv.linv = sec
+isHAℤₕ .isHAEquiv.rinv = ret
+isHAℤₕ .isHAEquiv.com  = coh
+
+hoc : (z : ℤₕ) → ap pred (ret z) ≡ sec (pred z)
+hoc = com-op isHAℤₕ
 -- Operations of HIT Integers
 infixl 6 _+_ _-_
 infixl 7 _*_
