@@ -205,6 +205,14 @@ isAbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.·InvR = ℤₕ-add-has-right-inv-e
 isAbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.·InvL = ℤₕ-add-has-left-inv-elem
 isAbGroupℤₕ+ .IsAbGroup.+Comm = ℤₕ-add-is-comm
 
+_*_ : ℤₕ → ℤₕ → ℤₕ
+zero      * b = zero
+succ a    * b = a * b + b
+pred a    * b = a * b - b
+sec a i   * b = ((ℤₕ-add-is-assoc (a * b) b (negate b) ∙ ap (λ k → a * b + k) (ℤₕ-add-has-right-inv-elem b)) ∙ ℤₕ-add-right-id (a * b)) i
+ret a i   * b = ((ℤₕ-add-is-assoc (a * b) (negate b) b ∙ ap (λ k → a * b + k) (ℤₕ-add-has-left-inv-elem b)) ∙ ℤₕ-add-right-id (a * b)) i
+coh a i j * b = {! ((ℤₕ-add-is-assoc (a * b) b (negate b) ∙ ap (λ k → a * b + k) (ℤₕ-add-has-right-inv-elem b)) ∙ ℤₕ-add-right-id (a * b)) i!}
+
 -- Is it a Monoid under multiplication?
 ℤₕ-mul-is-assoc : (a : ℤₕ) → (b : ℤₕ) → (c : ℤₕ) → (a * b) * c ≡ a * (b * c)
 ℤₕ-mul-is-assoc a b c = {!   !}
