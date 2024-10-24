@@ -103,12 +103,12 @@ cohℤω (strneg (suc n)) = refl
 
 -- Conversions between the two type definitions
 ℤₕ-to-ℤω : ℤₕ → ℤω
-ℤₕ-to-ℤω zero          = zero
-ℤₕ-to-ℤω (succ n)      = succℤω (ℤₕ-to-ℤω n)
-ℤₕ-to-ℤω (pred n)      = predℤω (ℤₕ-to-ℤω n)
-ℤₕ-to-ℤω (sec n i)     = secℤω (ℤₕ-to-ℤω n) i
-ℤₕ-to-ℤω (ret n i)     = retℤω (ℤₕ-to-ℤω n) i
-ℤₕ-to-ℤω (coh n i₁ i₂) = cohℤω (ℤₕ-to-ℤω n) i₁ i₂
+ℤₕ-to-ℤω zero        = zero
+ℤₕ-to-ℤω (succ n)    = succℤω (ℤₕ-to-ℤω n)
+ℤₕ-to-ℤω (pred n)    = predℤω (ℤₕ-to-ℤω n)
+ℤₕ-to-ℤω (sec n i)   = secℤω (ℤₕ-to-ℤω n) i
+ℤₕ-to-ℤω (ret n i)   = retℤω (ℤₕ-to-ℤω n) i
+ℤₕ-to-ℤω (coh n i j) = cohℤω (ℤₕ-to-ℤω n) i j
 
 ℤω-to-ℤₕ : ℤω → ℤₕ
 ℤω-to-ℤₕ zero             = zero
