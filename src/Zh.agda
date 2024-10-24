@@ -215,6 +215,14 @@ ret a i   * b = ((ℤₕ-add-is-assoc (a * b) (negate b) b ∙ ap (λ k → a * 
 coh a i j * b = {! ((ℤₕ-add-is-assoc (a * b) b (negate b) ∙ ap (λ k → a * b + k) (ℤₕ-add-has-right-inv-elem b)) ∙ ℤₕ-add-right-id (a * b)) i!}
 
 -- Is it a Monoid under multiplication?
+ℤₕ-mul-is-assoc : (a b c : ℤₕ) → (a * b) * c ≡ a * (b * c)
+ℤₕ-mul-is-assoc zero b c = refl
+ℤₕ-mul-is-assoc (succ a) b c = {!   !}
+ℤₕ-mul-is-assoc (pred a) b c = {!   !}
+ℤₕ-mul-is-assoc (sec a i) b c = {!   !}
+ℤₕ-mul-is-assoc (ret a i) b c = {!   !}
+ℤₕ-mul-is-assoc (coh a i i₁) b c = {!   !}
+
 -- Helping lemma for ℤₕ-mul-has-right-id-elem
 ℤₕ-mul-right-id : (a : ℤₕ) → a * succ zero ≡ a
 ℤₕ-mul-right-id zero = refl
