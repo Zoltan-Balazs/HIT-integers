@@ -16,6 +16,8 @@ open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Prelude renaming (congS to ap)
 open import Cubical.HITs.PropositionalTruncation
 
+module Zh where
+
 -- Higher inductive type definition of ℤ
 data ℤₕ : Set where
     zero : ℤₕ
