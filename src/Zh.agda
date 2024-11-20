@@ -586,6 +586,31 @@ inv-* m n =
     cong (_+ m * n * o) (sym (inv-* n o))
     ∙
     *-distribʳ-+ (- n) (m * n) o)
+
+AbGroupℤₕ+ : IsAbGroup {lzero} {ℤₕ} zero _+_ (-_)
+AbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.isMonoid .IsMonoid.isSemigroup .IsSemigroup.is-set = isSetℤₕ
+AbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.isMonoid .IsMonoid.isSemigroup .IsSemigroup.·Assoc = +-assoc
+AbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.isMonoid .IsMonoid.·IdR = +-idʳ
+AbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.isMonoid .IsMonoid.·IdL = +-idˡ
+AbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.·InvR = +-invʳ
+AbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.·InvL = +-invˡ
+AbGroupℤₕ+ .IsAbGroup.+Comm = +-comm
+
+Monoidℤₕ* : IsMonoid {lzero} {ℤₕ} (succ zero) _*_
+Monoidℤₕ* .IsMonoid.isSemigroup .IsSemigroup.is-set = isSetℤₕ
+Monoidℤₕ* .IsMonoid.isSemigroup .IsSemigroup.·Assoc = *-assoc
+Monoidℤₕ* .IsMonoid.·IdR = *-idʳ
+Monoidℤₕ* .IsMonoid.·IdL = *-idˡ
+
+Ringℤₕ*+ : IsRing {lzero} {ℤₕ} zero (succ zero) _+_ _*_ (-_)
+Ringℤₕ*+ .IsRing.+IsAbGroup = AbGroupℤₕ+
+Ringℤₕ*+ .IsRing.·IsMonoid = Monoidℤₕ*
+Ringℤₕ*+ .IsRing.·DistR+ = λ m n o → sym (*-distribˡ-+ m n o)
+Ringℤₕ*+ .IsRing.·DistL+ = λ m n o → sym (*-distribʳ-+ m n o)
+
+CommRingℤₕ*+ : IsCommRing {lzero} {ℤₕ} zero (succ zero) _+_ _*_ (-_)
+CommRingℤₕ*+ .IsCommRing.isRing = Ringℤₕ*+
+CommRingℤₕ*+ .IsCommRing.·Comm = *-comm
 infixr 8 _^^_
 
 _^^_ : ℤₕ → ℕ → ℤₕ
