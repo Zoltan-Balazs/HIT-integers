@@ -13,7 +13,13 @@ open import Cubical.Data.Nat.Base hiding (_+_)
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Equiv.HalfAdjoint
 open import Cubical.Foundations.Isomorphism
-open import Cubical.Foundations.Prelude renaming (congS to ap)
+open import Cubical.Foundations.Equiv
+open import Cubical.Foundations.Equiv.Properties
+open import Cubical.Foundations.Function
+open import Cubical.Foundations.HLevels
+open import Cubical.Foundations.Path
+open import Cubical.Foundations.Prelude
+open import Cubical.Foundations.GroupoidLaws
 open import Cubical.HITs.PropositionalTruncation
 
 module Zh where
@@ -294,6 +300,26 @@ isSetℤₕ = subst isSet ℤ≡ℤₕ isSetℤ
     (λ z pz → toPathP (P-isProp z _ _))
     (λ z pz → toPathP (P-isProp z _ _))
     (λ z pz → isProp→SquareP (λ i j → P-isProp (coh z i j)) _ _ _ _)
+
+-- Iterator
+ℤₕ-ite :
+  ∀ {ℓ} {A : Type ℓ}
+  → A
+  → A ≃ A
+  → ℤₕ
+  → A
+ℤₕ-ite {A = A} a e =
+  let
+    (s , isHA) = equiv→HAEquiv e
+  in
+    ℤₕ-ind
+      {P = λ _ → A}
+      a
+      (λ _ → s)
+      (λ _ → g isHA)
+      (λ _ → linv isHA)
+      (λ _ → rinv isHA)
+      (λ _ → com isHA)
 infixl 6 _+_ _-_
 infixl 7 _*_
 
