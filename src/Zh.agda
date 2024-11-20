@@ -244,6 +244,38 @@ hcomp (λ k → λ { (j = i0) → y
 
 isSetℤₕ : isSet ℤₕ
 isSetℤₕ = subst isSet ℤ≡ℤₕ isSetℤ
+
+-- Induction principle (eliminator)
+ℤₕ-ind :
+    ∀ {ℓ} {P : ℤₕ → Type ℓ}
+  → (P-zero : P zero)
+  → (P-succ : ∀ z → P z → P (succ z))
+  → (P-pred : ∀ z → P z → P (pred z))
+  → (P-sec : ∀ z → (pz : P z) →
+           PathP
+             (λ i → P (sec z i))
+             (P-pred (succ z) (P-succ z pz))
+             pz)
+  → (P-ret : ∀ z → (pz : P z) →
+           PathP
+             (λ i → P (ret z i))
+             (P-succ (pred z) (P-pred z pz))
+             pz)
+  → (P-coh : ∀ z → (pz : P z) →
+           SquareP
+             (λ i j → P (coh z i j))
+             (congP (λ i → P-succ (sec z i)) (P-sec z pz))
+             (P-ret (succ z) (P-succ z pz))
+             refl
+             refl)
+  → (z : ℤₕ)
+  → P z
+ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh zero = P-zero
+ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh (succ z) = P-succ z (ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh z)
+ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh (pred z) = P-pred z (ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh z)
+ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh (sec z i) = P-sec z (ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh z) i
+ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh (ret z i) = P-ret z (ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh z) i
+ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh (coh z i j) = P-coh z (ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh z) i j
 infixl 6 _+_ _-_
 infixl 7 _*_
 
