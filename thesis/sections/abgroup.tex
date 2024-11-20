@@ -1,0 +1,97 @@
+\chapter{Abelian Group (Addition)}
+\label{ch:abgroup}
+
+\section{Addition Operation}
+\begin{minted}[fontsize=\small]{agda}
+succIso : Iso ℤₕ ℤₕ
+succIso .Iso.fun      = succ
+succIso .Iso.inv      = pred
+succIso .Iso.rightInv = ret
+succIso .Iso.leftInv  = sec
+
+succEquiv : ℤₕ ≃ ℤₕ
+succEquiv = isoToEquiv succIso
+
+infixl 6 _+_
+_+_ : ℤₕ → ℤₕ → ℤₕ
+_+_ = ℤₕ-ite (idfun ℤₕ) (postCompEquiv succEquiv)
+\end{minted}
+
+\section{Associativity}
+\begin{minted}[fontsize=\small]{agda}
++-assoc : ∀ m n o → m + (n + o) ≡ (m + n) + o
++-assoc = ℤₕ-ind-prop
+  (λ _ → isPropΠ2 λ _ _ → isSetℤₕ _ _)
+  (λ n o → refl)
+  (λ m p n o → cong succ (p n o))
+  (λ m p n o → cong pred (p n o))
+\end{minted}
+
+\section{Identity Element}
+\begin{minted}[fontsize=\small]{agda}
++-idˡ : ∀ z → zero + z ≡ z
++-idˡ z = refl
+
++-zero : ∀ z → z + zero ≡ z
++-zero = ℤₕ-ind-prop
+  (λ _ → isSetℤₕ _ _)
+  refl
+  (λ z p → cong succ p)
+  (λ z p → cong pred p)
+
++-idʳ : ∀ z → z + zero ≡ z
++-idʳ = +-zero
+\end{minted}
+
+\section{Negation and Subtraction}
+\begin{minted}[fontsize=\small]{agda}
+-_ : ℤₕ → ℤₕ
+-_ = ℤₕ-ite zero (invEquiv succEquiv)
+
+_-_ : ℤₕ → ℤₕ → ℤₕ
+m - n = m + (- n)
+\end{minted}
+
+\section{Inverse Element}
+\begin{minted}[fontsize=\small]{agda}
++-succ : ∀ m n → m + succ n ≡ succ (m + n)
++-succ = ℤₕ-ind-prop
+  (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
+  (λ m → refl)
+  (λ m p n → cong succ (p n))
+  (λ m p n → cong pred (p n) ∙ sec (m + n) ∙ sym (ret (m + n)))
+
++-pred : ∀ m n → m + pred n ≡ pred (m + n)
++-pred = ℤₕ-ind-prop
+  (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
+  (λ m → refl)
+  (λ m p n → cong succ (p n) ∙ ret (m + n) ∙ sym (sec (m + n)))
+  (λ m p n → cong pred (p n))
+
++-invˡ : ∀ z → (- z) + z ≡ zero
++-invˡ = ℤₕ-ind-prop
+  (λ _ → isSetℤₕ _ _)
+  refl
+  (λ z p → cong pred (+-succ (- z) z) ∙ sec _ ∙ p)
+  (λ z p → cong succ (+-pred (- z) z) ∙ ret _ ∙ p)
+
++-invʳ : ∀ z → z + (- z) ≡ zero
++-invʳ = ℤₕ-ind-prop
+  (λ _ → isSetℤₕ _ _)
+  refl
+  (λ z p → cong succ (+-pred z (- z)) ∙ ret _ ∙ p)
+  (λ z p → cong pred (+-succ z (- z)) ∙ sec _ ∙ p)
+\end{minted}
+
+\section{Commutativity}
+\begin{minted}[fontsize=\small]{agda}
++-comm : ∀ m n → m + n ≡ n + m
++-comm m n = +-comm' n m
+  where
+  +-comm' : ∀ n m → m + n ≡ n + m
+  +-comm' = ℤₕ-ind-prop
+    (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
+    +-zero
+    (λ n p m → +-succ m n ∙ cong succ (p m))
+    (λ n p m → +-pred m n ∙ cong pred (p m))
+\end{minted}
