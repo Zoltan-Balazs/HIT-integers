@@ -635,6 +635,22 @@ instance
   ℤₕ-Neg : Negative ℤₕ
   Constraint ℤₕ-Neg _ = Unit
   fromNeg ℤₕ-Neg n = convert-neg n
+
+open import Cubical.Data.Bool
+
+infix  4 _≡ᶻ_ _<_
+
+_≡ᶻ_ : ℤₕ → ℤₕ → Bool
+zero      ≡ᶻ zero      = true
+succ n    ≡ᶻ succ m    = n ≡ᶻ m
+pred n    ≡ᶻ pred m    = n ≡ᶻ m
+sec n i   ≡ᶻ sec m j   = ?
+ret n i   ≡ᶻ ret m j   = ?
+coh n i j ≡ᶻ coh m k l = ?
+-- _         ≡ᶻ _         = false
+
+_<_ : ℤₕ → ℤₕ → Bool
+x < y = ?
 infixr 8 _^^_
 
 _^^_ : ℤₕ → ℕ → ℤₕ
