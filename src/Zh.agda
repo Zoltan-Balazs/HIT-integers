@@ -445,7 +445,147 @@ inv-hom-ℤₕ = ℤₕ-ind-prop
   (λ m p n → cong pred (p n))
   (λ m p n → cong succ (p n))
 
+Iso-n+-ℤₕ : (z : ℤₕ) → Iso ℤₕ ℤₕ
+Iso.fun (Iso-n+-ℤₕ z) = z +_
+Iso.inv (Iso-n+-ℤₕ z) = - z +_
+Iso.rightInv (Iso-n+-ℤₕ n) m =
+  +-assoc n (- n) m
+  ∙
+  cong (_+ m) (+-invʳ n)
+Iso.leftInv (Iso-n+-ℤₕ n) m =
+  +-assoc (- n) n m
+  ∙
+  cong (_+ m) (+-invˡ n)
+
+isEquiv-n+-ℤₕ : ∀ z → isEquiv (z +_)
+isEquiv-n+-ℤₕ z = isoToIsEquiv (Iso-n+-ℤₕ z)
+
 _*_ : ℤₕ → ℤₕ → ℤₕ
+m * n = ℤₕ-ite zero (n +_ , isEquiv-n+-ℤₕ n) m
+
+*-zero : ∀ z → z * zero ≡ zero
+*-zero = ℤₕ-ind-prop
+  (λ - → isSetℤₕ _ _)
+  refl
+  (λ z p → p)
+  (λ z p → p)
+
+*-succ : ∀ m n → m * succ n ≡ m + m * n
+*-succ = ℤₕ-ind-prop
+  (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
+  (λ n → refl)
+  (λ m p n → cong succ
+    (cong (n +_) (p n)
+    ∙
+    +-assoc n m (m * n)
+    ∙
+    cong (_+ m * n) (+-comm n m)
+    ∙
+    sym (+-assoc m n (m * n))))
+  (λ m p n → cong pred
+    (cong (- n +_) (p n)
+    ∙
+    +-assoc (- n) m (m * n)
+    ∙
+    cong (_+ m * n) (+-comm (- n) m)
+    ∙
+    sym (+-assoc m (- n) (m * n))))
+
+*-pred : ∀ m n → m * pred n ≡ (- m) + m * n
+*-pred = ℤₕ-ind-prop
+  (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
+  (λ n → refl)
+  (λ m p n → cong pred
+    (cong (n +_) (p n)
+    ∙
+    +-assoc n (- m) (m * n)
+    ∙
+    cong (_+ m * n) (+-comm n (- m))
+    ∙
+    sym (+-assoc (- m) n (m * n))))
+  (λ m p n → cong succ
+    (cong (- n +_) (p n)
+    ∙
+    +-assoc (- n) (- m) (m * n)
+    ∙
+    cong (_+ m * n) (+-comm (- n) (- m))
+    ∙
+    sym (+-assoc (- m) (- n) (m * n))))
+
+*-comm : ∀ m n → m * n ≡ n * m
+*-comm = ℤₕ-ind-prop
+  (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
+  (λ n → sym (*-zero n))
+  (λ m p n → cong (n +_) (p n)
+             ∙
+             sym (*-succ n m))
+  (λ m p n → cong (- n +_) (p n)
+             ∙
+             sym (*-pred n m))
+
+*-idˡ : ∀ z → succ zero * z ≡ z
+*-idˡ = +-zero
+
+*-idʳ : ∀ z → z * succ zero ≡ z
+*-idʳ z =
+  *-comm z (succ zero)
+  ∙
+  *-idˡ z
+
+*-distribʳ-+ : ∀ m n o → (m * o) + (n * o) ≡ (m + n) * o
+*-distribʳ-+ = ℤₕ-ind-prop
+  (λ _ → isPropΠ2 λ _ _ → isSetℤₕ _ _)
+  (λ n o → refl)
+  (λ m p n o → sym (+-assoc o (m * o) (n * o))
+               ∙
+               cong (o +_) (p n o))
+  (λ m p n o → sym (+-assoc (- o) (m * o) (n * o))
+               ∙
+               cong (- o +_) (p n o))
+
+*-distribˡ-+ : ∀ o m n → (o * m) + (o * n) ≡ o * (m + n)
+*-distribˡ-+ o m n =
+  cong (_+ o * n) (*-comm o m)
+  ∙
+  cong (m * o +_) (*-comm o n)
+  ∙
+  *-distribʳ-+ m n o
+  ∙
+  *-comm (m + n) o
+
+*-inv : ∀ m n → m * (- n) ≡ - (m * n)
+*-inv = ℤₕ-ind-prop
+  (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
+  (λ n → refl)
+  (λ m p n → cong (- n +_) (p n)
+             ∙
+             sym (inv-hom-ℤₕ n (m * n)))
+  (λ m p n → cong (- (- n) +_) (p n)
+             ∙
+             sym (inv-hom-ℤₕ (- n) (m * n)))
+
+inv-* : ∀ m n → (- m) * n ≡ - (m * n)
+inv-* m n =
+  *-comm (- m) n
+  ∙
+  *-inv n m
+  ∙
+  cong (-_) (*-comm n m)
+
+*-assoc : ∀ m n o → m * (n * o) ≡ (m * n) * o
+*-assoc = ℤₕ-ind-prop
+  (λ _ → isPropΠ2 λ _ _ → isSetℤₕ _ _)
+  (λ n o → refl)
+  (λ m p n o →
+    cong (n * o +_) (p n o)
+    ∙
+    *-distribʳ-+ n (m * n) o)
+  (λ m p n o →
+    cong (- (n * o) +_) (p n o)
+    ∙
+    cong (_+ m * n * o) (sym (inv-* n o))
+    ∙
+    *-distribʳ-+ (- n) (m * n) o)
 infixr 8 _^^_
 
 _^^_ : ℤₕ → ℕ → ℤₕ
