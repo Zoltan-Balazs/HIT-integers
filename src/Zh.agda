@@ -58,8 +58,8 @@ hoc = com-op isHAℤₕ
   i j
 
 ℤ-ℤₕ : ℤ → ℤₕ
-ℤ-ℤₕ (ℤ.pos zero) = zero
-ℤ-ℤₕ (ℤ.pos (suc n)) = succ (ℤ-ℤₕ (ℤ.pos n))
+ℤ-ℤₕ (pos zero) = zero
+ℤ-ℤₕ (pos (suc n)) = succ (ℤ-ℤₕ (pos n))
 ℤ-ℤₕ (negsuc zero) = pred zero
 ℤ-ℤₕ (negsuc (suc n)) = pred (ℤ-ℤₕ (negsuc n))
 
