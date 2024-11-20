@@ -7,9 +7,9 @@ open import Cubical.Algebra.Group
 open import Cubical.Algebra.Monoid
 open import Cubical.Algebra.Ring
 open import Cubical.Algebra.Semigroup
-open import Cubical.Data.Int renaming (_+_ to _+ᶻ_; _-_ to _-ᶻ_)
-open import Cubical.Data.Int.MoreInts.BiInvInt renaming (pred to predᵇ; _+_ to _+ᵇ_; _-_ to _-ᵇ_)
-open import Cubical.Data.Nat hiding (_+_)
+open import Cubical.Data.Int renaming (_+_ to _+ᶻ_; _-_ to _-ᶻ_; -_ to -ᶻ_)
+open import Cubical.Data.Int.MoreInts.BiInvInt.Base renaming (pred to predᵇ)
+open import Cubical.Data.Nat.Base hiding (_+_)
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Equiv.HalfAdjoint
 open import Cubical.Foundations.Isomorphism
@@ -45,12 +45,17 @@ hoc : (z : ℤₕ) → ap pred (ret z) ≡ sec (pred z)
 hoc = com-op isHAℤₕ
 
 ℤₕ-ℤ : ℤₕ → ℤ
-ℤₕ-ℤ zero = ℤ.pos zero
+ℤₕ-ℤ zero = pos zero
 ℤₕ-ℤ (succ x) = sucℤ (ℤₕ-ℤ x)
 ℤₕ-ℤ (pred x) = predℤ (ℤₕ-ℤ x)
 ℤₕ-ℤ (sec x i) = predSuc (ℤₕ-ℤ x) i
 ℤₕ-ℤ (ret x i) = sucPred (ℤₕ-ℤ x) i
-ℤₕ-ℤ (coh x i j) = {!!}
+ℤₕ-ℤ (coh x i j) = isSetℤ
+  (sucℤ (predℤ (sucℤ (ℤₕ-ℤ x))))
+  (sucℤ (ℤₕ-ℤ x))
+  (congS sucℤ (predSuc (ℤₕ-ℤ x)))
+  (sucPred (sucℤ (ℤₕ-ℤ x)))
+  i j
 
 ℤ-ℤₕ : ℤ → ℤₕ
 ℤ-ℤₕ (ℤ.pos zero) = zero
