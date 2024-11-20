@@ -1,4 +1,4 @@
-{-# OPTIONS --cubical #-}
+{-# OPTIONS --cubical --no-postfix-projections #-}
 
 open import Agda.Primitive
 open import Cubical.Algebra.AbGroup
