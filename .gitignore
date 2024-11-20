@@ -2,7 +2,9 @@
 references/
 
 thesis/*
+thesis/images/*.pdf
 !thesis/thesis.pdf
+!thesis/thesis.bib
 !thesis/thesis.tex
 !thesis/elteikthesis*
 !thesis/images/
