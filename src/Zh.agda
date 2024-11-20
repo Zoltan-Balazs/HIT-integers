@@ -651,6 +651,16 @@ coh n i j ≡ᶻ coh m k l = ?
 
 _<_ : ℤₕ → ℤₕ → Bool
 x < y = ?
+
+record NonZero (z : ℤₕ) : Set where
+  field
+    nonZero : Unit (not (z ≡ᶻ zero))
+
+infixl 7 _/_
+
+_/_ : ℤₕ → ℤₕ → ℤₕ
+x / y = {!!}
+
 infixr 8 _^^_
 
 _^^_ : ℤₕ → ℕ → ℤₕ
