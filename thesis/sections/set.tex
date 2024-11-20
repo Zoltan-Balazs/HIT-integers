@@ -1,0 +1,261 @@
+\chapter{Set properties}
+\label{ch:set}
+
+Defining set properties first will make it much easier for us to define operations on our type (iterator), as well make it fairly trivial to prove the needed properties for a set to form a commutative ring (induction property). Let us define the induction property first, to make this easier, we will define a helper property, the induction principle (otherwise known as the eliminator).
+
+\section{Induction principle (eliminator)}
+
+Defining the induction principle will be fairly easy, given that we have a correct type definition:
+\begin{minted}[fontsize=\small]{agda}
+ℤₕ-ind :
+  ∀ {ℓ} {P : ℤₕ → Type ℓ}
+  → (P-zero : P zero)
+  → (P-succ : ∀ z → P z → P (succ z))
+  → (P-pred : ∀ z → P z → P (pred z))
+  → (P-sec : ∀ z → (pz : P z) →
+           PathP
+             (λ i → P (sec z i))
+             (P-pred (succ z) (P-succ z pz))
+             pz)
+  → (P-ret : ∀ z → (pz : P z) →
+           PathP
+             (λ i → P (ret z i))
+             (P-succ (pred z) (P-pred z pz))
+             pz)
+  → (P-coh : ∀ z → (pz : P z) →
+           SquareP
+             (λ i j → P (coh z i j))
+             (congP (λ i → P-succ (sec z i)) (P-sec z pz))
+             (P-ret (succ z) (P-succ z pz))
+             refl
+             refl)
+  → (z : ℤₕ)
+  → P z
+\end{minted}
+This eliminator will allow us to !!EXPAND!!
+The definition is fairly trivial, we will just need to pattern match on the given integer and use recursion:
+\begin{minted}[fontsize=\small]{agda}
+ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh zero        = P-zero
+ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh (succ z)    = P-succ z (ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh z)
+ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh (pred z)    = P-pred z (ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh z)
+ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh (sec z i)   = P-sec z (ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh z) i
+ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh (ret z i)   = P-ret z (ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh z) i
+ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh (coh z i j) = P-coh z (ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh z) i j
+\end{minted}
+
+\section{Induction property}
+
+With the induction principle, defining the induction property is even easier. The induction property will allow us to only prove the commutative ring properties for the base element and the 0-dimensional constructors ($succ$ and $pred$), for the 1- and 2-dimensional constructors ($sec$, $ret$ and $coh$) the proofs will be derived:
+\begin{minted}[fontsize=\small]{agda}
+ℤₕ-ind-prop :
+  ∀ {ℓ} {P : ℤₕ → Type ℓ}
+  → (∀ z → isProp (P z))
+  → P zero
+  → (∀ z → P z → P (succ z))
+  → (∀ z → P z → P (pred z))
+  → (z : ℤₕ)
+  → P z
+ℤₕ-ind-prop {P = P} P-isProp P-zero P-succ P-pred =
+  ℤₕ-ind
+    P-zero
+    P-succ
+    P-pred
+    (λ z pz → toPathP (P-isProp z _ _))
+    (λ z pz → toPathP (P-isProp z _ _))
+    (λ z pz → isProp→SquareP (λ i j → P-isProp (coh z i j)) _ _ _ _)
+\end{minted}
+(Note: We use the fact that Agda can infer the needed arguments for $P-isProp$, we can also manually give these parameters, but this would only lengthen our definition. See the source file for the manually given parameters.)
+
+\section{Iterator}
+While the induction property is useful for allowing us to use induction when proving properties, the iterator property will make it easier for us to define operations on our type. While it would be possible to manually pattern match, we would have a hard time to give the needed boundaries in the 1- and 2-dimensional cases, especially in the case of multiplication.
+
+Our iterator will !!NEEDED!!
+\begin{minted}[fontsize=\small]{agda}
+ℤₕ-ite :
+  ∀ {ℓ} {A : Type ℓ}
+  → A
+  → A ≃ A
+  → ℤₕ
+  → A
+ℤₕ-ite {A = A} a e =
+  let
+    (s , isHA) = equiv→HAEquiv e
+  in
+    ℤₕ-ind
+      {P = λ _ → A}
+      a
+      (λ _ → s)
+      (λ _ → g isHA)
+      (λ _ → linv isHA)
+      (λ _ → rinv isHA)
+      (λ _ → com isHA)
+\end{minted}
+
+\section{IsSet}
+This will be the first quite labours property to define. To make our live easier in the future, we will have to prove that our definition of integers actually form a set. To prove this, we will prove that our definition of integers is isomorphic with the standard definition of integers in cubical Agda:
+\begin{minted}{agda}
+data ℤ : Type₀ where
+  pos    : (n : ℕ) → ℤ
+  negsuc : (n : ℕ) → ℤ
+\end{minted}
+To do this, we will need to define 4 functions:
+\begin{compactitem}
+  \item We can convert our type to the standard integer definition
+  \item We can convert from the standard integer definition to our type
+  \item Converting the standard integer definition to our type, and back to the standard integer definition results in the exact same value
+  \item Converting our type to the standard integer definition, and back to our type results in the exact same value
+\end{compactitem}
+Let us begin with proving these.
+
+\subsection{Converting our type to the standard definition}
+!!NEEDED!!
+\begin{minted}[fontsize=\small]{agda}
+ℤₕ-ℤ : ℤₕ → ℤ
+ℤₕ-ℤ zero        = pos zero
+ℤₕ-ℤ (succ x)    = sucℤ (ℤₕ-ℤ x)
+ℤₕ-ℤ (pred x)    = predℤ (ℤₕ-ℤ x)
+ℤₕ-ℤ (sec x i)   = predSuc (ℤₕ-ℤ x) i
+ℤₕ-ℤ (ret x i)   = sucPred (ℤₕ-ℤ x) i
+ℤₕ-ℤ (coh x i j) = isSetℤ
+  (sucℤ (predℤ (sucℤ (ℤₕ-ℤ x))))
+  (sucℤ (ℤₕ-ℤ x))
+  (congS sucℤ (predSuc (ℤₕ-ℤ x)))
+  (sucPred (sucℤ (ℤₕ-ℤ x)))
+  i j
+\end{minted}
+
+\subsection{Converting the standard definition to our type}
+!!NEEDED!!
+\begin{minted}[fontsize=\small]{agda}
+ℤ-ℤₕ : ℤ → ℤₕ
+ℤ-ℤₕ (pos zero)       = zero
+ℤ-ℤₕ (pos (suc n))    = succ (ℤ-ℤₕ (pos n))
+ℤ-ℤₕ (negsuc zero)    = pred zero
+ℤ-ℤₕ (negsuc (suc n)) = pred (ℤ-ℤₕ (negsuc n))
+\end{minted}
+
+\subsection{Converting the standard definition to our type and back}
+!!NEEDED!!
+\begin{minted}[fontsize=\small]{agda}
+ℤ-ℤₕ-ℤ : (z : ℤ) → ℤₕ-ℤ (ℤ-ℤₕ z) ≡ z
+ℤ-ℤₕ-ℤ (ℤ.pos zero)     = refl
+ℤ-ℤₕ-ℤ (ℤ.pos (suc n))  = cong sucℤ (ℤ-ℤₕ-ℤ (ℤ.pos n))
+ℤ-ℤₕ-ℤ (negsuc zero)    = refl
+ℤ-ℤₕ-ℤ (negsuc (suc n)) = cong predℤ (ℤ-ℤₕ-ℤ (negsuc n))
+\end{minted}
+
+\subsection{Converting our type to the standard definition and back}
+!!NEEDED!!
+\begin{minted}[fontsize=\small]{agda}
+ℤ-ℤₕ-sucℤ : (z : ℤ) → ℤ-ℤₕ (sucℤ z) ≡ succ (ℤ-ℤₕ z)
+ℤ-ℤₕ-sucℤ (pos n)          = refl
+ℤ-ℤₕ-sucℤ (negsuc zero)    = sym (ret (ℤ-ℤₕ (pos zero)))
+ℤ-ℤₕ-sucℤ (negsuc (suc n)) = sym (ret (ℤ-ℤₕ (negsuc n)))
+
+ℤ-ℤₕ-predℤ : (z : ℤ) → ℤ-ℤₕ (predℤ z) ≡ pred (ℤ-ℤₕ z)
+ℤ-ℤₕ-predℤ (pos zero)    = refl
+ℤ-ℤₕ-predℤ (pos (suc n)) = sym (sec (ℤ-ℤₕ (pos n)))
+ℤ-ℤₕ-predℤ (negsuc n)    = refl
+
+sym-filler : ∀ {ℓ} {A : Type ℓ} {x y : A} (p : x ≡ y)
+                → Square (sym p)
+                         refl
+                         refl
+                         p
+sym-filler p i j = p (i ∨ ~ j)
+
+ℤ-ℤₕ-sucPred : (z : ℤ)
+              → Square (ℤ-ℤₕ-sucℤ (predℤ z) ∙ (λ j → succ (ℤ-ℤₕ-predℤ z j)))
+                       (λ _ → ℤ-ℤₕ z)
+                       (λ i → ℤ-ℤₕ (sucPred z i))
+                       (ret (ℤ-ℤₕ z))
+ℤ-ℤₕ-sucPred (pos zero) i j =
+  hcomp (λ k → λ { (j = i0) → ℤ-ℤₕ (pos zero)
+                 ; (i = i0) → rUnit (sym (ret (ℤ-ℤₕ (pos zero)))) k j
+                 ; (i = i1) → ℤ-ℤₕ (pos zero)
+                 ; (j = i1) → ret (ℤ-ℤₕ (pos zero)) i
+                 })
+        (sym-filler (ret (ℤ-ℤₕ (pos zero))) i j)
+ℤ-ℤₕ-sucPred (pos (suc n)) i j =
+  hcomp (λ k → λ { (j = i0) → succ (ℤ-ℤₕ (pos n))
+                 ; (i = i0) → lUnit (λ i → succ (sym (sec (ℤ-ℤₕ (pos n))) i)) k j
+                 ; (i = i1) → succ (ℤ-ℤₕ (pos n))
+                 ; (j = i1) → coh (ℤ-ℤₕ (pos n)) k i
+                 })
+        (succ (sym-filler (sec (ℤ-ℤₕ (pos n))) i j))
+ℤ-ℤₕ-sucPred (negsuc n) i j =
+  hcomp (λ k → λ { (j = i0) → ℤ-ℤₕ (negsuc n)
+                 ; (i = i0) → rUnit (sym (ret (ℤ-ℤₕ (negsuc n)))) k j
+                 ; (i = i1) → ℤ-ℤₕ (negsuc n)
+                 ; (j = i1) → ret (ℤ-ℤₕ (negsuc n)) i
+                 })
+        (sym-filler (ret (ℤ-ℤₕ (negsuc n))) i j)
+
+ℤ-ℤₕ-predSuc : (x : ℤ)
+              → Square (ℤ-ℤₕ-predℤ (sucℤ x) ∙ (λ i → pred (ℤ-ℤₕ-sucℤ x i)))
+                       (λ _ → ℤ-ℤₕ x)
+                       (λ i → ℤ-ℤₕ (predSuc x i))
+                       (sec (ℤ-ℤₕ x))
+ℤ-ℤₕ-predSuc (pos n) i j =
+    hcomp (λ k → λ { (j = i0) → ℤ-ℤₕ (pos n)
+                   ; (i = i0) → rUnit (sym (sec (ℤ-ℤₕ (pos n)))) k j
+                   ; (i = i1) → ℤ-ℤₕ (pos n)
+                   ; (j = i1) → sec (ℤ-ℤₕ (pos n)) i
+                   })
+          (sym-filler (sec (ℤ-ℤₕ (pos n))) i j)
+ℤ-ℤₕ-predSuc (negsuc zero) i j =
+    hcomp (λ k → λ { (j = i0) → ℤ-ℤₕ (negsuc zero)
+                   ; (i = i0) → lUnit (λ i → pred (sym (ret (ℤ-ℤₕ (pos zero))) i)) k j
+                   ; (i = i1) → ℤ-ℤₕ (negsuc zero)
+                   ; (j = i1) → hoc (ℤ-ℤₕ (pos zero)) k i
+                   })
+          (pred (sym-filler (ret (ℤ-ℤₕ (pos zero))) i j))
+ℤ-ℤₕ-predSuc (negsuc (suc n)) i j =
+    hcomp (λ k → λ { (j = i0) → ℤ-ℤₕ (negsuc (suc n))
+                   ; (i = i0) → lUnit (λ i → pred (sym (ret (ℤ-ℤₕ (negsuc n))) i)) k j
+                   ; (i = i1) → ℤ-ℤₕ (negsuc (suc n))
+                   ; (j = i1) → hoc (ℤ-ℤₕ (negsuc n)) k i
+                   })
+          (pred (sym-filler (ret (ℤ-ℤₕ (negsuc n))) i j))
+
+ℤₕ-ℤ-ℤₕ zero          = refl
+ℤₕ-ℤ-ℤₕ (succ z)      = ℤ-ℤₕ-sucℤ (ℤₕ-ℤ z) ∙ (λ i → succ (ℤₕ-ℤ-ℤₕ z i))
+ℤₕ-ℤ-ℤₕ (pred z)      = ℤ-ℤₕ-predℤ (ℤₕ-ℤ z) ∙ (λ i → pred (ℤₕ-ℤ-ℤₕ z i))
+ℤₕ-ℤ-ℤₕ (sec z i) j   =
+  hcomp (λ k → λ { (j = i0) → ℤ-ℤₕ (predSuc (ℤₕ-ℤ z) i)
+                 ; (i = i0) → (ℤ-ℤₕ-predℤ (sucℤ (ℤₕ-ℤ z)) ∙ (λ i → pred (compPath-filler (ℤ-ℤₕ-sucℤ (ℤₕ-ℤ z))
+                     (λ i' → succ (ℤₕ-ℤ-ℤₕ z i'))
+                     k i))) j
+                 ; (i = i1) → ℤₕ-ℤ-ℤₕ z (j ∧ k)
+                 ; (j = i1) → sec (ℤₕ-ℤ-ℤₕ z k) i })
+        (ℤ-ℤₕ-predSuc (ℤₕ-ℤ z) i j)
+ℤₕ-ℤ-ℤₕ (ret z i) j   =
+  hcomp (λ k → λ { (j = i0) → ℤ-ℤₕ (sucPred (ℤₕ-ℤ z) i)
+                 ; (i = i0) → (ℤ-ℤₕ-sucℤ (predℤ (ℤₕ-ℤ z)) ∙ (λ i → succ (compPath-filler (ℤ-ℤₕ-predℤ (ℤₕ-ℤ z))
+                     (congS pred (ℤₕ-ℤ-ℤₕ z))
+                     k i))) j
+                 ; (i = i1) → ℤₕ-ℤ-ℤₕ z (j ∧ k)
+                 ; (j = i1) → ret (ℤₕ-ℤ-ℤₕ z k) i  })
+        (ℤ-ℤₕ-sucPred (ℤₕ-ℤ z) i j)
+ℤₕ-ℤ-ℤₕ (coh z i j) k = ?
+\end{minted}
+
+\subsection{Set property}
+With these 4 functions defined, we can prove that our type is isomorphic with the standard definition:
+\begin{minted}[fontsize=\small]{agda}
+ℤ-iso : Iso ℤ ℤₕ
+ℤ-iso .Iso.fun      = ℤ-ℤₕ
+ℤ-iso .Iso.inv      = ℤₕ-ℤ
+ℤ-iso .Iso.rightInv = ℤₕ-ℤ-ℤₕ
+ℤ-iso .Iso.leftInv  = ℤ-ℤₕ-ℤ
+
+ℤ≡ℤₕ : ℤ ≡ ℤₕ
+ℤ≡ℤₕ = isoToPath ℤ-iso
+\end{minted}
+We pattern match on the constructors of $Iso$ (isomorphism) and we provide the needed fields. (As discussed earlier.)
+
+Finally, we can use the fact that the standard definition forms a set to our advantage, as our type is isomorphic with the standard definition means that our type also forms a set:
+\begin{minted}{agda}
+isSetℤₕ : isSet ℤₕ
+isSetℤₕ = subst isSet ℤ≡ℤₕ isSetℤ
+\end{minted}
