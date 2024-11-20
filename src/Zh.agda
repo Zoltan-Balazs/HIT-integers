@@ -53,6 +53,10 @@ isHAℤₕ .isHAEquiv.com  = coh
 hoc : (z : ℤₕ) → congS pred (ret z) ≡ sec (pred z)
 hoc = com-op isHAℤₕ
 
+congS₂ : {ℓ ℓ' ℓ'' : Level} {A : Type ℓ} {B : Type ℓ'} {C : Type ℓ''}
+         (f : A → B → C) {x y : A} {x' y' : B} → x ≡ y → x' ≡ y' → f x x' ≡ f y y'
+congS₂ f e1 e2 i = f (e1 i) (e2 i)
+
 ℤₕ-ℤ : ℤₕ → ℤ
 ℤₕ-ℤ zero = pos zero
 ℤₕ-ℤ (succ x) = sucℤ (ℤₕ-ℤ x)
