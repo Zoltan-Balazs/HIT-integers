@@ -611,6 +611,30 @@ Ringℤₕ*+ .IsRing.·DistL+ = λ m n o → sym (*-distribʳ-+ m n o)
 CommRingℤₕ*+ : IsCommRing {lzero} {ℤₕ} zero (succ zero) _+_ _*_ (-_)
 CommRingℤₕ*+ .IsCommRing.isRing = Ringℤₕ*+
 CommRingℤₕ*+ .IsCommRing.·Comm = *-comm
+
+open import Agda.Builtin.FromNat
+open import Agda.Builtin.FromNeg
+
+open HasFromNat public
+open HasFromNeg public
+
+private
+  convert : ℕ → ℤₕ
+  convert zero = zero
+  convert (suc n) = succ (convert n)
+
+  convert-neg : ℕ → ℤₕ
+  convert-neg zero = zero
+  convert-neg (suc n) = pred (convert-neg n)
+
+instance
+  ℤₕ-Num : Number ℤₕ
+  Constraint ℤₕ-Num _ =  Unit
+  fromNat ℤₕ-Num n = convert n
+
+  ℤₕ-Neg : Negative ℤₕ
+  Constraint ℤₕ-Neg _ = Unit
+  fromNeg ℤₕ-Neg n = convert-neg n
 infixr 8 _^^_
 
 _^^_ : ℤₕ → ℕ → ℤₕ
