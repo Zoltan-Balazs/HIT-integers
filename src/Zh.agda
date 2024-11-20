@@ -276,6 +276,24 @@ isSetℤₕ = subst isSet ℤ≡ℤₕ isSetℤ
 ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh (sec z i) = P-sec z (ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh z) i
 ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh (ret z i) = P-ret z (ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh z) i
 ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh (coh z i j) = P-coh z (ℤₕ-ind P-zero P-succ P-pred P-sec P-ret P-coh z) i j
+
+-- Induction property
+ℤₕ-ind-prop :
+  ∀ {ℓ} {P : ℤₕ → Type ℓ}
+  → (∀ z → isProp (P z))
+  → P zero
+  → (∀ z → P z → P (succ z))
+  → (∀ z → P z → P (pred z))
+  → (z : ℤₕ)
+  → P z
+ℤₕ-ind-prop {P = P} P-isProp P-zero P-succ P-pred =
+  ℤₕ-ind
+    P-zero
+    P-succ
+    P-pred
+    (λ z pz → toPathP (P-isProp z _ _))
+    (λ z pz → toPathP (P-isProp z _ _))
+    (λ z pz → isProp→SquareP (λ i j → P-isProp (coh z i j)) _ _ _ _)
 infixl 6 _+_ _-_
 infixl 7 _*_
 
