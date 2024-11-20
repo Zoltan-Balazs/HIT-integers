@@ -330,130 +330,120 @@ isSetℤₕ = subst isSet ℤ≡ℤₕ isSetℤ
       (λ _ → linv isHA)
       (λ _ → rinv isHA)
       (λ _ → com isHA)
+
+succIso : Iso ℤₕ ℤₕ
+succIso .Iso.fun = succ
+succIso .Iso.inv = pred
+succIso .Iso.rightInv = ret
+succIso .Iso.leftInv = sec
+
+succEquiv : ℤₕ ≃ ℤₕ
+succEquiv = isoToEquiv succIso
+
 infixl 6 _+_ _-_
 infixl 7 _*_
 
 _+_ : ℤₕ → ℤₕ → ℤₕ
-zero      + b = b
-succ a    + b = succ (a + b)
-pred a    + b = pred (a + b)
-sec a i   + b = sec (a + b) i
-ret a i   + b = ret (a + b) i
-coh a i j + b = coh (a + b) i j
+_+_ = ℤₕ-ite (idfun ℤₕ) (postCompEquiv succEquiv)
 
-negate : ℤₕ → ℤₕ
-negate zero        = zero
-negate (succ z)    = pred (negate z)
-negate (pred z)    = succ (negate z)
-negate (sec z i)   = ret (negate z) i
-negate (ret z i)   = sec (negate z) i
-negate (coh z i j) = hoc (negate z) i j
++-zero : ∀ z → z + zero ≡ z
++-zero = ℤₕ-ind-prop
+  (λ _ → isSetℤₕ _ _)
+  refl
+  (λ z p → cong succ p)
+  (λ z p → cong pred p)
+
++-succ : ∀ m n → m + succ n ≡ succ (m + n)
++-succ = ℤₕ-ind-prop
+  (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
+  (λ m → refl)
+  (λ m p n → cong succ (p n))
+  (λ m p n → cong pred (p n)
+             ∙
+             sec (m + n)
+             ∙
+             sym (ret (m + n)))
+
++-pred : ∀ m n → m + pred n ≡ pred (m + n)
++-pred = ℤₕ-ind-prop
+  (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
+  (λ m → refl)
+  (λ m p n → cong succ (p n)
+             ∙
+             ret (m + n)
+             ∙
+             sym (sec (m + n)))
+  (λ m p n → cong pred (p n))
+
++-comm : ∀ m n → m + n ≡ n + m
++-comm m n = +-comm' n m
+  where
+  +-comm' : ∀ n m → m + n ≡ n + m
+  +-comm' = ℤₕ-ind-prop
+    (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
+    +-zero
+    (λ n p m → +-succ m n
+               ∙
+               cong succ (p m))
+    (λ n p m → +-pred m n
+               ∙
+               cong pred (p m))
+
++-assoc : ∀ m n o → m + (n + o) ≡ (m + n) + o
++-assoc = ℤₕ-ind-prop
+  (λ _ → isPropΠ2 λ _ _ → isSetℤₕ _ _)
+  (λ n o → refl)
+  (λ m p n o → cong succ (p n o))
+  (λ m p n o → cong pred (p n o))
+
+-_ : ℤₕ → ℤₕ
+-_ = ℤₕ-ite zero (invEquiv succEquiv)
 
 _-_ : ℤₕ → ℤₕ → ℤₕ
-a - b = a + negate b
+m - n = m + (- n)
 
-sucr+ : (a b : ℤₕ) → a + succ b ≡ succ (a + b)
-sucr+ zero        b = refl
-sucr+ (succ a)    b = ap succ (sucr+ a b)
-sucr+ (pred a)    b = ap pred (sucr+ a b) ∙ sec (a + b) ∙ sym (ret (a + b))
-sucr+ (sec a i)   b = {! ap (λ k → sec k i) (sucr+ a b)!}
-sucr+ (ret a i)   b = {!   !}
-sucr+ (coh a i j) b = {!   !}
++-idˡ : ∀ z → zero + z ≡ z
++-idˡ z = refl
 
-predr+ : (a b : ℤₕ) → a + pred b ≡ pred (a + b)
-predr+ zero        b = refl
-predr+ (succ a)    b = ap succ (predr+ a b) ∙ ret (a + b) ∙ sym (sec (a + b))
-predr+ (pred a)    b = ap pred (predr+ a b)
-predr+ (sec a i)   b = {!   !}
-predr+ (ret a i)   b = {!   !}
-predr+ (coh a i j) b = {!   !}
++-idʳ : ∀ z → z + zero ≡ z
++-idʳ = +-zero
 
-inv-additivity : (z : ℤₕ) → z - z ≡ zero
-inv-additivity zero        = refl
-inv-additivity (succ z)    = ap succ (predr+ z (negate z)) ∙ ret (z - z) ∙ inv-additivity z
-inv-additivity (pred z)    = ap pred (sucr+ z (negate z)) ∙ sec (z - z) ∙ inv-additivity z
-inv-additivity (sec z i)   = {!   !}
-inv-additivity (ret z i)   = {!   !}
-inv-additivity (coh z i j) = {!   !}
++-invˡ : ∀ z → (- z) + z ≡ zero
++-invˡ = ℤₕ-ind-prop
+  (λ _ → isSetℤₕ _ _)
+  refl
+  (λ z p → cong pred (+-succ (- z) z)
+                      ∙
+                      sec _
+                      ∙
+                      p)
+  (λ z p → cong succ (+-pred (- z) z)
+                      ∙
+                      ret _
+                      ∙
+                      p)
 
--- Properties needed for HIT Integers to form a Commutative Ring
--- Is it an Abelian Group under addition?
-ℤₕ-add-is-assoc : (a b c : ℤₕ) → (a + b) + c ≡ a + (b + c)
-ℤₕ-add-is-assoc zero        b c = refl
-ℤₕ-add-is-assoc (succ a)    b c = ap succ (ℤₕ-add-is-assoc a b c)
-ℤₕ-add-is-assoc (pred a)    b c = ap pred (ℤₕ-add-is-assoc a b c)
-ℤₕ-add-is-assoc (sec a i)   b c = ap (λ k → sec k i) (ℤₕ-add-is-assoc a b c)
-ℤₕ-add-is-assoc (ret a i)   b c = ap (λ k → ret k i) (ℤₕ-add-is-assoc a b c)
-ℤₕ-add-is-assoc (coh a i j) b c = ap (λ k → coh k i j) (ℤₕ-add-is-assoc a b c)
++-invʳ : ∀ z → z + (- z) ≡ zero
++-invʳ = ℤₕ-ind-prop
+  (λ _ → isSetℤₕ _ _)
+  refl
+  (λ z p → cong succ (+-pred z (- z))
+                      ∙
+                      ret _
+                      ∙
+                      p)
+  (λ z p → cong pred (+-succ z (- z))
+                      ∙
+                      sec _
+                      ∙
+                      p)
 
--- Helping lemma for ℤₕ-add-has-right-id-elem
-ℤₕ-add-right-id : (a : ℤₕ) → a + zero ≡ a
-ℤₕ-add-right-id zero = refl
-ℤₕ-add-right-id (succ a) = ap succ (ℤₕ-add-right-id a)
-ℤₕ-add-right-id (pred a) = ap pred (ℤₕ-add-right-id a)
-ℤₕ-add-right-id (sec a i) = ap (λ k → sec k i) (ℤₕ-add-right-id a)
-ℤₕ-add-right-id (ret a i) = ap (λ k → ret k i) (ℤₕ-add-right-id a)
-ℤₕ-add-right-id (coh a i j) = ap (λ k → coh k i j) (ℤₕ-add-right-id a)
-
-ℤₕ-add-has-right-id-elem : ∃[ b ∈ ℤₕ ] ((a : ℤₕ) → a + b ≡ a)
-ℤₕ-add-has-right-id-elem = ∣ zero , ℤₕ-add-right-id ∣₁
-
--- Helping lemma for ℤₕ-add-has-left-id-elem
-ℤₕ-add-left-id : (a : ℤₕ) → zero + a ≡ a
-ℤₕ-add-left-id a = refl
-
-ℤₕ-add-has-left-id-elem : ∃[ b ∈ ℤₕ ] ((a : ℤₕ) → b + a ≡ a)
-ℤₕ-add-has-left-id-elem = ∣ zero , ℤₕ-add-left-id ∣₁
-
-ℤₕ-add-has-right-inv-elem : (a : ℤₕ) → a + negate a ≡ zero
-ℤₕ-add-has-right-inv-elem zero = refl
-ℤₕ-add-has-right-inv-elem (succ a) = {!!}
-ℤₕ-add-has-right-inv-elem (pred a) = {!!}
-ℤₕ-add-has-right-inv-elem (sec a i) = {!!}
-ℤₕ-add-has-right-inv-elem (ret a i) = {!!}
-ℤₕ-add-has-right-inv-elem (coh a i j) = {!!}
-
-ℤₕ-add-has-left-inv-elem : (a : ℤₕ) → negate a + a ≡ zero
-ℤₕ-add-has-left-inv-elem zero = refl
-ℤₕ-add-has-left-inv-elem (succ a) = {! sym (predr+ (negate a) (succ a)) ∙ ℤₕ-add-has-left-inv-elem (sec a)!}
-ℤₕ-add-has-left-inv-elem (pred a) = {!!}
-ℤₕ-add-has-left-inv-elem (sec a i) = {!!}
-ℤₕ-add-has-left-inv-elem (ret a i) = {!!}
-ℤₕ-add-has-left-inv-elem (coh a i j) = {!!}
-
--- Helping lemmas for ℤₕ-add-is-comm
-ℤₕ-add-comm-succ-helper : (a b : ℤₕ) → succ a + b ≡ a + succ b
-ℤₕ-add-comm-succ-helper zero b = refl
-ℤₕ-add-comm-succ-helper (succ a) b = ap succ (ℤₕ-add-comm-succ-helper a b)
-ℤₕ-add-comm-succ-helper (pred a) b = ret (a + b) ∙ sym (sec (a + b)) ∙ ap pred (ℤₕ-add-comm-succ-helper a b)
-ℤₕ-add-comm-succ-helper (sec a i) b = {!   !}
-ℤₕ-add-comm-succ-helper (ret a i) b = {!   !}
-ℤₕ-add-comm-succ-helper (coh a i j) b = {!   !}
-
-ℤₕ-add-comm-pred-helper : (a b : ℤₕ) → pred a + b ≡ a + pred b
-ℤₕ-add-comm-pred-helper zero b = refl
-ℤₕ-add-comm-pred-helper (succ a) b = sec (a + b) ∙ sym (ret (a + b)) ∙ ap succ (ℤₕ-add-comm-pred-helper a b)
-ℤₕ-add-comm-pred-helper (pred a) b = ap pred (ℤₕ-add-comm-pred-helper a b)
-ℤₕ-add-comm-pred-helper (sec a i) b = {!   !}
-ℤₕ-add-comm-pred-helper (ret a i) b = {!   !}
-ℤₕ-add-comm-pred-helper (coh a i j) b = {!   !}
-
-ℤₕ-add-is-comm : (a b : ℤₕ) → a + b ≡ b + a
-ℤₕ-add-is-comm zero b = sym (ℤₕ-add-right-id b)
-ℤₕ-add-is-comm (succ a) b = ap succ (ℤₕ-add-is-comm a b) ∙ ℤₕ-add-comm-succ-helper b a
-ℤₕ-add-is-comm (pred a) b = ap pred (ℤₕ-add-is-comm a b) ∙ ℤₕ-add-comm-pred-helper b a
-ℤₕ-add-is-comm (sec a i) b = {!   ap (λ k → sec k i) (ℤₕ-add-is-comm a b) !}
-ℤₕ-add-is-comm (ret a i) b = {!   !}
-ℤₕ-add-is-comm (coh a i j) b = {!   !}
-
-isAbGroupℤₕ+ : IsAbGroup {lzero} {ℤₕ} zero _+_ negate
-isAbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.isMonoid .IsMonoid.isSemigroup .IsSemigroup.is-set = isSetℤₕ
-isAbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.isMonoid .IsMonoid.isSemigroup .IsSemigroup.·Assoc = λ x y z → sym (ℤₕ-add-is-assoc x y z)
-isAbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.isMonoid .IsMonoid.·IdR = ℤₕ-add-right-id
-isAbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.isMonoid .IsMonoid.·IdL = ℤₕ-add-left-id
-isAbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.·InvR = ℤₕ-add-has-right-inv-elem
-isAbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.·InvL = ℤₕ-add-has-left-inv-elem
-isAbGroupℤₕ+ .IsAbGroup.+Comm = ℤₕ-add-is-comm
+inv-hom-ℤₕ : ∀ m n → - (m + n) ≡ (- m) + (- n)
+inv-hom-ℤₕ = ℤₕ-ind-prop
+  (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
+  (λ n → refl)
+  (λ m p n → cong pred (p n))
+  (λ m p n → cong succ (p n))
 
 _*_ : ℤₕ → ℤₕ → ℤₕ
 infixr 8 _^^_
