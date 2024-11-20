@@ -11,10 +11,23 @@
 % See elteikthesis_minted.tex for example
 \usepackage[newfloat]{minted}
 \usepackage[utf8]{inputenc}
+\removefromtoclist[float]{lol}
 
 \DeclareUnicodeCharacter{2124}{$\mathbb{Z}$}
-\DeclareUnicodeCharacter{2095}{h}
+\DeclareUnicodeCharacter{2095}{$_h$}
 \DeclareUnicodeCharacter{2261}{$\equiv$}
+\DeclareUnicodeCharacter{2200}{$\forall$}
+\DeclareUnicodeCharacter{2113}{$\ell$}
+\DeclareUnicodeCharacter{03BB}{$\lambda$}
+\DeclareUnicodeCharacter{2243}{$\simeq$}
+\DeclareUnicodeCharacter{2080}{$_0$}
+\DeclareUnicodeCharacter{2115}{$\mathbb{N}$}
+\DeclareUnicodeCharacter{03A0}{$\Pi$}
+\DeclareUnicodeCharacter{02E1}{$^l$}
+\DeclareUnicodeCharacter{02B3}{$^r$}
+\DeclareUnicodeCharacter{2219}{$\bullet$}
+\DeclareUnicodeCharacter{2228}{$\vee$}
+\DeclareUnicodeCharacter{2227}{$\wedge$}
 
 % Document's metadata
 \title{Integers as a Higher Inductive Type} % title
@@ -25,7 +38,7 @@
 \degree{Computer Science MSc}
 
 % Superivsor(s)' metadata
-\supervisor{Ambrus Kaposi Dr.} % internal supervisor's name
+\supervisor{Dr. Ambrus Kaposi} % internal supervisor's name
 \affiliation{Associate Professor} % internal supervisor's affiliation
 %\extsupervisor{Jane Doe} % external supervisor's name
 %\extaffiliation{Senior Developer} % external supervisor's affiliation
@@ -53,29 +66,29 @@
 % Title page (mandatory)
 \maketitle
 % Topic declaration page (mandatory) - can also be attached instead
-%\includepdf{topicdeclaration.pdf}
+\includepdf{topicdeclaration.pdf}
 
 % Table of contents (mandatory)
 \tableofcontents
 \cleardoublepage
 
 % Main content
-\input{text/intro.tex}
+\input{sections/intro.tex}
 \cleardoublepage
 
-\input{text/set.tex}
+\input{sections/set.tex}
 \cleardoublepage
 
-\input{text/abgroup.tex}
+\input{sections/abgroup.tex}
 \cleardoublepage
 
-\input{text/monoid.tex}
+\input{sections/monoid.tex}
 \cleardoublepage
 
-\input{text/commring.tex}
+\input{sections/commring.tex}
 \cleardoublepage
 
-\input{text/further.tex}
+\input{sections/further.tex}
 \cleardoublepage
 
 % Bibliography (mandatory)
