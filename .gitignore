@@ -3,6 +3,7 @@ references/
 
 thesis/*
 thesis/images/*.pdf
+!thesis/topicdeclaration.pdf
 !thesis/thesis.pdf
 !thesis/thesis.bib
 !thesis/thesis.tex
