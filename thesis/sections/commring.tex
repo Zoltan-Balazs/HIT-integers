@@ -2,21 +2,102 @@
 \label{ch:commring}
 
 \section{Multiplication is Commutative}
-\begin{minted}[fontsize=\small]{agda}
+To prove that multiplication is commutative, we will need to first prove 3 helper theorems:
+
+\begin{theorem}
+  Multiplying any number from the right by 0 results in 0. ∀ z ∈ ℤ: z * 0 = 0
+\end{theorem}
+
+\begin{proof}
+  While 0 * z = 0 is true in Agda, we have to prove z * 0 = 0, even if it turns out to be just a formality to do so. Using our induction property:
+
+  For the base case (n = 0): 0 * 0 = 0 is a reflection, we don't even need to write a lambda expression.
+
+  For the succ case: (succ z) * 0 = 0. It is sufficient in Agda to just supply our original equality (z * 0 = 0), as both sides are reduced to 0.
+
+  For the pred case: (pred z) * 0 = 0. Similarly, it is sufficient to supply our original equality (z * 0 = 0), to prove this.
+\end{proof}
+
+\begin{listing}[H]
+\begin{minted}{agda}
+*-zero : ∀ z → z * zero ≡ zero
+*-zero = ℤₕ-ind-prop
+  (λ _ → isSetℤₕ _ _)
+  refl
+  (λ z p → p)
+  (λ z p → p)
+\end{minted}
+\caption{Agda proof of multiplication by 0 from the right is 0}
+\end{listing}
+
+\begin{theorem}
+  The succ constructor can be destructed by multiplication: ∀ m, n ∈ ℤ: m * succ n = m + m * n
+\end{theorem}
+
+\begin{proof}
+  Using our induction property:
+
+  For the base case (m = 0): 0 * (succ n) = 0 + 0 * n is a reflection.
+
+  For the succ case: (succ m) * (succ n) = (succ m) + ((succ m) * n). Definitionally, we know that succ m * n ≡ n + m * n, this way we can rewrite our equation as such: succ n + m * succ n = succ m + (n + m * n). We also know definitionally that succ m + n = succ (m + n), so we can once again rewrite our equation as such: succ (n + m * succ n) = succ (m + (n + m * n)). We can note that using congruence to get under succ on both sides, the equation we need to prove is going to be n + m * succ n = m + (n + m * n). Using congruence to get under the 'n +' part, we can apply our original equality with 'n' parameter, this will result in n + m * succ n = n + (m + m * n). Note that our left-hand side is already the exact same that we need, also note that by parts, our right-hand side is essentially the same as well. Using transitivity, we further change our right-hand side, using the associative property of addition with 'n' being the m parameter, 'm' being the n parameter and 'm * n' being the o parameter. This will change the equation to n + m * succ n = (n + m) + m * n (Note: In agda, the parenthesis on the right-hand side won't show up.) The 'm * n' part is already at its correct position, using another transitivity to change the right-hand side and getting under the 'm * n' part by using congruence, we can use the commutative property of addition (with 'n' being the m parameter, and 'm' being the n parameter) to rewrite this equation to: n + m * succ n = (m + n) + m * n. Further using another transitivity, we can use the symmetric version of the associative property of addition (with 'm' being the m parameter, 'n' being the n parameter and 'm * n' being the o parameter) we can rewrite the right-hand side of (m + n) + m * n to m + (n + m * n). This is the exact right-hand side we need, our case is proven.
+
+  For the pred case: (pred m) * (succ n) = (pred m) + ((pred m) * n). Similarly to the 'succ' case: definitionally, we know that pred m * n ≡ (- n) + m * n, this way we can rewrite our equation as such: (- (succ n)) + m * succ n = pred m + ((- n) + m * n). Furthermore, we know that - (succ m) = pred (- m), so we can rewrite the left-hand side to: pred (- n) + m * succ n. We also know definitionally that pred m + n = pred (m + n), so our whole equation can be rewritten again as such: pred ((- n) + m * succ n) = pred (m + ((- n) + m * n)). We can note that using congruence to get under pred on both sides, the equation we need to prove is going to be (- n) + m * succ n = m + ((- n) + m * n). Using congruence to get under the '(- n) +' part, we can apply our original equality with 'n' parameter, this will result in (- n) + m * succ n = (- n) + (m + m * n). Note that our left-hand side is already the exact same that we need, also note that by parts, our right-hand side is essentially the same as well. Using transitivity, we further change our right-hand side, using the associative property of addition with '- n' being the m parameter, 'm' being the n parameter and 'm * n' being the o parameter. This will change the equation to (- n) + m * succ n = ((- n) + m) + m * n (Note: Once again, in agda, the parenthesis on the right-hand side won't show up.) The 'm * n' part is already at its correct position, using another transitivity to change the right-hand side and getting under the '+ m * n' part by using congruence, we can use the commutative property of addition (with '- n' being the m parameter, and 'm' being the n parameter) to rewrite this equation to: (- n) + m * succ n = (m + (- n)) + m * n. Further using another transitivity, we can use the symmetric version of the associative property of addition (with 'm' being the m parameter, '- n' being the n parameter and 'm * n' being the o parameter) we can rewrite the right-hand side of (m + (- n)) + m * n to m + ((- n) + m * n). This is once again the exact right-hand side we need, this case is also proven.
+\end{proof}
+
+\begin{listing}[H]
+\begin{minted}{agda}
 *-succ : ∀ m n → m * succ n ≡ m + m * n
 *-succ = ℤₕ-ind-prop
   (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
   (λ n → refl)
   (λ m p n → cong succ (cong (n +_) (p n) ∙ +-assoc n m (m * n) ∙ cong (_+ m * n) (+-comm n m) ∙ sym (+-assoc m n (m * n))))
   (λ m p n → cong pred (cong (- n +_) (p n) ∙ +-assoc (- n) m (m * n) ∙ cong (_+ m * n) (+-comm (- n) m) ∙ sym (+-assoc m (- n) (m * n))))
+\end{minted}
+\caption{Agda proof of succ being destructed by multiplication}
+\end{listing}
 
+\begin{theorem}
+  The pred constructor can be destructed by multiplication: ∀ m, n ∈ ℤ: m * pred n = (- m) + m * n
+\end{theorem}
+
+\begin{proof}
+  Using our induction property:
+
+  For the base case (m = 0): 0 * (pred n) = (- 0) + 0 * n is a reflection.
+
+  For the succ case: (succ m) * (pred n) = - (succ m) + ((succ m) * n). Similarly to the previously proven *-succ: we know definitionally the following: 1) succ m * n = n + m * n, 2) - (succ m) = pred (- m), 3) pred m + n = pred (m + n). Using 1) we can rewrite the equation to: (pred n) + m * (pred n) = - (succ m) + (n + m * n). Using 2) we can rewrite the right-hand side to: (pred n) + m * (pred n) = pred (- m) + (n + m * n) and using 3) we can rewrite the whole equation to: pred (n + m * (pred n)) = pred ((- m) + (n + m * n)). We can use congruence once again to get under the pred part, so the equation we need to prove becomes n + m * (pred n) = (- m) + (n + m * n). Once again, getting under the 'n +' part on the left-hand side, we can use the original equality with 'n' parameter, this will result in n + m * (pred n) = n + ((- m) + m * n). The left-hand side is once again the exact same as the one that we need to prove. Our right-hand side can be changed by using transitivity. First, we will change it using the associative property of addition, by passing 'n' as the m parameter, '- m' as the n parameter, and 'm * n' as the o parameter, this will change the right-hand side to: (n + (- m)) + m * n (Note: Once again, in agda, the parenthesis won't show up.). Further using transitivity, we can get under the '+ m * n' part, where using the commutative property of addition, with 'n' as the m parameter and '- m' as the n parameter, we can change this side to: ((- m) + n) + m * n. Once again, using the symmetric version of the associative property of addition, with '- m' as the m parameter, 'n' as the n parameter, and 'm * n' as the o parameter, we change the parenthesis of our right-hand side to: (- m) + (n + m * n). This is the exact same as our simplified right-hand side, this case is proven.
+
+  For the pred case: (pred m) * (pred n) = - (pred m) + ((pred m) * n). Similarly to the 'succ' case: we know definitionally the following: 1) pred m * n = (- n) + m * n, 2) - (pred m) = succ (- m), 3) succ m + n = succ (m + n). Using 1) we can rewrite the equation to: - (pred n) + m * (pred n) = - (pred m) + ((- n) + m * n). Using 2) we can rewrite the equation to: succ (- n) + m * (pred n) = succ (- m) + ((- n) + m * n). Using 3) we can rewrite the equation to: succ ((- n) + m * (pred n)) = succ ((- m) + ((- n) + m * n)). We can use congruence once again to get under the succ part, so the equation we need to prove becomes (- n) + m * (pred n) = (- m) + ((- n) + m * n). Once again, getting under the '(- n) +' part on the left-hand side, we can use the original equality with 'n' parameter, this will result in (- n) + m * (pred n) = (- n) + ((- m) + m * n). The left-hand side is once again the exact same as the one that we need to prove. Our right-hand side can be changed by using transitivity. First, we will change it using the associative property of addition, by passing '- n' as the m parameter, '- m' as the n parameter, and 'm * n' as the o parameter, this will change the right-hand side to: ((- n) + (- m)) + m * n (Note: As in the previous 3 cases, in agda, the parenthesis won't show up.). Further using transitivity, we can get under the '+ m * n' part, where using the commutative property of addition, with '- n' as the m parameter and '- m' as the n parameter, we can change this side to: ((- m) + (- n)) + m * n. Once again, using the symmetric version of the associative property of addition, with '- m' as the m parameter, '- n' as the n parameter, and 'm * n' as the o parameter, we change the parenthesis of our right-hand side to: (- m) + ((- n) + m * n). This is the exact same as our simplified right-hand side, this case is also proven.
+\end{proof}
+
+\begin{listing}[H]
+\begin{minted}{agda}
 *-pred : ∀ m n → m * pred n ≡ (- m) + m * n
 *-pred = ℤₕ-ind-prop
   (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
   (λ n → refl)
   (λ m p n → cong pred (cong (n +_) (p n) ∙ +-assoc n (- m) (m * n) ∙ cong (_+ m * n) (+-comm n (- m)) ∙ sym (+-assoc (- m) n (m * n))))
   (λ m p n → cong succ (cong (- n +_) (p n) ∙ +-assoc (- n) (- m) (m * n) ∙ cong (_+ m * n) (+-comm (- n) (- m)) ∙ sym (+-assoc (- m) (- n) (m * n))))
+\end{minted}
+\caption{Agda proof of pred being destructed by multiplication}
+\end{listing}
 
+\begin{theorem}
+  Multiplication is commutative: ∀ m, n ∈ ℤ: m * n = n * m
+\end{theorem}
+
+\begin{proof}
+  Using our induction property:
+
+  For the base case (m = 0): 0 * n = n * 0. We note that the left side of the equation is reduced to 0. Therefore, we really need to prove the following: 0 = n * 0. Previously, we proved that n * 0 = 0, we can once again use this property (providing 'n' as a parameter), but taking the symmetric version of it.
+
+  For the succ case: (succ m) * n = n * (succ m). Definitionnaly, we know that (succ m) * n = n + m * n. Rewriting the equation as such we get: n + m * n = n * (succ m). We also know (by proving that multiplication destructs the succ constructor) that n * (succ m) = n + n * m. If we use congruence to get under the additional addition of 'n +', we can provide the original equality to get the same left-hand side. With this we have: n + m * n = n + n * m. We need to use transitivity to further deal with the right-hand side. By using the symmetric version of the previously mentioned property (multiplication destructing succ), we can rewrite the right-hand side to the needed n * (succ m).
+
+  For the pred case: (pred m) * n = n * (pred m). Similarly to the succ case, we know that (pred m) * n = (- n) + (m * n), we also know (from proving that multiplication destructs the pred constructor) that n * (pred m) = (- n) + n * m. With these two notes, we can apply a similar line of thought to the equation, by getting under the addition of '(- n) +', using the original equality to get our desired result, then rewriting the right-hand side by using the symmetrics version of our previously proven property of multiplication destructing pred.
+\end{proof}
+
+\begin{listing}[H]
+\begin{minted}{agda}
 *-comm : ∀ m n → m * n ≡ n * m
 *-comm = ℤₕ-ind-prop
   (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
@@ -24,6 +105,8 @@
   (λ m p n → cong (n +_) (p n) ∙ sym (*-succ n m))
   (λ m p n → cong (- n +_) (p n) ∙ sym (*-pred n m))
 \end{minted}
+\caption{Agda proof of multiplication being commutative}
+\end{listing}
 
 \section{Putting it All Together}
 \begin{minted}[fontsize=\small]{agda}
