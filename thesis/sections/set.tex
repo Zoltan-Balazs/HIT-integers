@@ -237,9 +237,9 @@ To prove the 'ret' case, the following helper function is introcuded:
 \caption{Agda partial proof that converting HIT integers to standard integers and back results in the same value}
 \end{listing}
 
-\subsection{Set property}
+\section{Set truncation}
 With these 4 functions defined, we can prove that our type is isomorphic with the standard definition:
-\begin{minted}[fontsize=\small]{agda}
+\begin{minted}{agda}
 ℤ-iso : Iso ℤ ℤₕ
 ℤ-iso .Iso.fun      = ℤ-ℤₕ
 ℤ-iso .Iso.inv      = ℤₕ-ℤ
@@ -249,7 +249,7 @@ With these 4 functions defined, we can prove that our type is isomorphic with th
 ℤ≡ℤₕ : ℤ ≡ ℤₕ
 ℤ≡ℤₕ = isoToPath ℤ-iso
 \end{minted}
-We pattern match on the constructors of $Iso$ (isomorphism) and we provide the needed fields. (As discussed earlier.)
+We pattern match on the constructors of 'Iso' (isomorphism) and we provide the needed fields. (As discussed earlier)
 
 Finally, we can use the fact that the standard definition forms a set to our advantage, as our type is isomorphic with the standard definition means that our type also forms a set:
 \begin{minted}{agda}
