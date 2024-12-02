@@ -90,21 +90,13 @@ We have to find out what the 7 other cubes required for the 4D tessaract are. Af
 Proving the discrete property might've been better after all.
 
 \section{Relations}
-!!NEEDED!!
-\begin{minted}[fontsize=\small]{agda}
+With an equivalence relation defined (which is default for all types), we can, for example, define the injection property for the 'succ' and 'pred' constructors as such:
+\begin{minted}{agda}
 succ-inj : ∀ m n → succ m ≡ succ n → m ≡ n
-succ-inj = ℤₕ-ind-prop
-  (λ _ → isPropΠ2 λ _ _ → isSetℤₕ _ _)
-  (λ n o → sym (sec zero) ∙ congS pred o ∙ sec n)
-  (λ m p n o → sym (sec (succ m)) ∙ congS pred o ∙ sec n)
-  (λ m p n o → sym (sec (pred m)) ∙ congS pred o ∙ sec n)
+succ-inj m n eq = sym (sec m) ∙ congS pred eq ∙ sec n
 
 pred-inj : ∀ m n → pred m ≡ pred n → m ≡ n
-pred-inj = ℤₕ-ind-prop
-  (λ _ → isPropΠ2 λ _ _ → isSetℤₕ _ _)
-  (λ n o → sym (ret zero) ∙ congS succ o ∙ ret n)
-  (λ m p n o → sym (ret (succ m)) ∙ congS succ o ∙ ret n)
-  (λ m p n o → sym (ret (pred m)) ∙ congS succ o ∙ ret n)
+pred-inj m n eq = sym (ret m) ∙ congS succ eq ∙ ret n
 \end{minted}
 
 \section{Division (and Modulus)}
