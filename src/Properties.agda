@@ -165,8 +165,14 @@ _+_ = ℤₕ-ite (idfun ℤₕ) (postCompEquiv succEquiv)
   (λ m p n o → cong succ (p n o))
   (λ m p n o → cong pred (p n o))
 
+-- Negation
+-- Definitionally the following hold true for negation:
+-- - zero     = zero
+-- - (succ m) = pred (- m)
+-- - (pred m) = succ (- m)
 -_ : ℤₕ → ℤₕ
 -_ = ℤₕ-ite zero (invEquiv succEquiv)
+-- - n = ℤₕ-ite zero (invEquiv succEquiv) n
 
 _-_ : ℤₕ → ℤₕ → ℤₕ
 m - n = m + (- n)
