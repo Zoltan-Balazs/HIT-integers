@@ -50,7 +50,22 @@ coh a i j + b = coh (a + b) i j
 \end{minted}
 
 \section{Associativity}
-\begin{minted}[fontsize=\small]{agda}
+\begin{theorem}
+  Addition is associative: ∀ m, n, o ∈ ℤ: m + (n + o) = (m + n) + o
+\end{theorem}
+
+\begin{proof}
+  We will use our induction property to prove this theorem. For the first case, which states that this is indeed a property, we will use the 'isProp' (specifically the one which takes 2 parameters) and our set property, thankfully cubical Agda can infer the parameters for this. In all future proofs we will rely on Agda inferring these parameters.
+
+  For the base case (m = 0) : 0 + (n + o) = (n + o) = (0 + n) + o is a reflection.
+
+  For the succ case: (succ m) + (n + o) = ((succ m) + n) + o, note that since we are using the induction property, we will have the original m + (n + o) = (m + n) + o equality, where we are free to change the parameters of 'n' and 'o' as we please. Applying succ to the original equality will result in succ (m + (n + o)) = succ (m + n + o), thanks to the fact that succ (m + n) = succ m + n holds true definitionally, where we can supply 'm' to the m parameter, and 'n + o' to the n parameter. We will also have to note that addition is parenthesized from the left, so succ m + n + o = (succ m + n) + o is also definitionally true.
+
+  For the pred case: (pred m) + (n + o) = ((pred m) + n) + o, similarly to the succ case, it is enough to apply pred to the original equality. We will once again note that pred (m + n) = pred m + n is definitionally true, and the fact that addition is parenthesized from the left.
+\end{proof}
+
+\begin{listing}[H]
+\begin{minted}{agda}
 +-assoc : ∀ m n o → m + (n + o) ≡ (m + n) + o
 +-assoc = ℤₕ-ind-prop
   (λ _ → isPropΠ2 λ _ _ → isSetℤₕ _ _)
@@ -58,6 +73,8 @@ coh a i j + b = coh (a + b) i j
   (λ m p n o → cong succ (p n o))
   (λ m p n o → cong pred (p n o))
 \end{minted}
+\caption{Agda proof of addition being associative}
+\end{listing}
 
 \section{Identity Element}
 \begin{minted}[fontsize=\small]{agda}
