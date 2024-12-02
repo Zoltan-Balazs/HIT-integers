@@ -156,11 +156,16 @@ hoc = com-op isHAℤₕ
                  ; (j = i1) → ret (ℤₕ→ℤ→ℤₕ z k) i  })
         (ℤ→ℤₕ-sucPred (ℤₕ→ℤ z) i j)
 ℤₕ→ℤ→ℤₕ (coh z i j) k = {!  !}
+
+-- Set truncation
 ℤ-iso : Iso ℤ ℤₕ
-ℤ-iso .Iso.fun      = ℤ-ℤₕ
-ℤ-iso .Iso.inv      = ℤₕ-ℤ
-ℤ-iso .Iso.rightInv = ℤₕ-ℤ-ℤₕ
-ℤ-iso .Iso.leftInv  = ℤ-ℤₕ-ℤ
+ℤ-iso .Iso.fun      = ℤ→ℤₕ
+ℤ-iso .Iso.inv      = ℤₕ→ℤ
+ℤ-iso .Iso.rightInv = ℤₕ→ℤ→ℤₕ
+ℤ-iso .Iso.leftInv  = ℤ→ℤₕ→ℤ
+
+ℤ≡ℤₕ : ℤ ≡ ℤₕ
+ℤ≡ℤₕ = isoToPath ℤ-iso
 
 isSetℤₕ : isSet ℤₕ
-isSetℤₕ = subst isSet (isoToPath (ℤ-iso)) isSetℤ
+isSetℤₕ = subst isSet ℤ≡ℤₕ isSetℤ
