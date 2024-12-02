@@ -49,3 +49,28 @@ The definition is fairly trivial, we will just need to pattern match on the give
 \caption{Agda code for the induction principle}
 \end{listing}
 
+\section{Induction property}
+
+With the induction principle, defining the induction property is easy. The induction property will allow us to only prove the upcoming commutative ring properties for the base element and the 0-dimensional constructors ('succ' and 'pred'), for the 1- and 2-dimensional constructors ('sec', 'ret' and 'coh') the proofs will be induced from the 'succ' and 'pred' proofs:
+\begin{listing}[H]
+\begin{minted}{agda}
+ℤₕ-ind-prop :
+  ∀ {ℓ} {P : ℤₕ → Type ℓ}
+  → (∀ z → isProp (P z))
+  → P zero
+  → (∀ z → P z → P (succ z))
+  → (∀ z → P z → P (pred z))
+  → (z : ℤₕ)
+  → P z
+ℤₕ-ind-prop {P = P} P-isProp P-zero P-succ P-pred =
+  ℤₕ-ind
+    P-zero
+    P-succ
+    P-pred
+    (λ z pz → toPathP (P-isProp z _ _))
+    (λ z pz → toPathP (P-isProp z _ _))
+    (λ z pz → isProp→SquareP (λ i j → P-isProp (coh z i j)) _ _ _ _)
+\end{minted}
+\caption{Agda code for the induction property}
+\end{listing}
+(Note: We use the fact that Agda can infer the needed arguments for 'P-isProp', we can also manually give these parameters, but this would only lengthen our definition. See the source file for the manually given parameters.)
