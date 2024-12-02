@@ -28,6 +28,27 @@ private
   convert-neg (suc n) = pred (convert-neg n)
 
 instance
+-- Alternative definition that ℤₕ is a set
+record ℤ-algebra : Set₁ where
+  field
+    Z : Set
+    ze : Z
+    su : Z ≡ Z
+
+record ℤ-hom (m n : ℤ-algebra) : Set where
+  module m = ℤ-algebra m
+  module n = ℤ-algebra n
+  field
+    Z : m.Z → n.Z
+    ze : Z (m.ze) ≡ n.ze
+    su : (λ (x : m.Z) → Z (transport m.su x)) ≡ (λ x → transport n.su (Z x))
+
+initial : ℤ-algebra → Set₁
+initial m = (n : ℤ-algebra) → isProp (ℤ-hom m n)
+
+initial-uniq : (m m' : ℤ-algebra) → initial m → initial m' → m ≡ m'
+initial-uniq m m' = {!!}
+
 -- Remaining proof that ℤₕ is a set
 ℤ→ℤₕ-sucPredSuc : (z : ℤ) → ℤ→ℤₕ (sucℤ (predℤ (sucℤ z))) ≡ succ (pred (succ (ℤ→ℤₕ z)))
 ℤ→ℤₕ-sucPredSuc z = ℤ→ℤₕ-sucℤ (predℤ (sucℤ z)) ∙ congS succ (ℤ→ℤₕ-predℤ (sucℤ z) ∙ congS pred (ℤ→ℤₕ-sucℤ z))
