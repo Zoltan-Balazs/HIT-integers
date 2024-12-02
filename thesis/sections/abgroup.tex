@@ -269,14 +269,29 @@ For proving the existence of left and right inverse elements, we will first prov
 \end{listing}
 
 \section{Commutativity}
-\begin{minted}[fontsize=\small]{agda}
+
+\begin{theorem}
+  Addition is commutative: ∀ m, n ∈ ℤ: m + n = n + m
+\end{theorem}
+
+\begin{proof}
+  Using our induction property:
+
+  For the base case (m = 0): 0 + n = n + 0, while this looks really similar to the left identity element existing, in Agda only 0 + n = n is true definitionally, n + 0 = n isn't. We will instead use the symmetric version of the right identity element existing with 'n' parameter. (Without symmetry this property will state that n + 0 = n, with symmetry, we will change the two sides: n = n + 0, as previously stated, in Agda 0 + n = n is a reflection.)
+
+  For the succ case: (succ m) + n = n + (succ m). Our left-hand side looks really similar definitionally to the right-hand side of the +-succ property. Using the symmetric version of the +-succ property with 'm' and 'n' parameters results in succ (m + n) = m + succ n. As previously mentioned, the left-hand side is true definitionally. Using transitivity, we can change the right-hand side by applying 'succ n' to our original equation, resulting in succ (m + n) = succ n + m. Thanks to the same definitionally true statement, we can use transitivity, with, once again, the symmetric version of +-succ with 'n' and 'm' supplied, to change succ n + m to n + succ m. (succ n + m is the same succ (n + m), which is on the right-hand side of our +-succ property, applying the symmetric version of +-succ with 'n' and 'm' parameters, we get n + succ m.)
+
+  For the pred case: (pred m) + n = n + (pred m). Our left-hand side looks really similar definitionally to the right-hand side of the +-pred property. Using the symmetric version of the +-pred property with 'm' and 'n' parameters results in pred (m + n) = m + pred n. As previously mentioned, the left-hand side is true definitionally. Using transitivity, we can change the right-hand side by applying 'pred n' to our original equation, resulting in pred (m + n) = pred n + m. Thanks to the same definitionally true statement, we can use transitivity, with, once again, the symmetric version of +-pred with 'n' and 'm' supplied, to change pred n + m to n + pred m. (The same chain of thought is true as in the 'succ' case, with pred instead of succ.)
+\end{proof}
+
+\begin{listing}[H]
+\begin{minted}{agda}
 +-comm : ∀ m n → m + n ≡ n + m
-+-comm m n = +-comm' n m
-  where
-  +-comm' : ∀ n m → m + n ≡ n + m
-  +-comm' = ℤₕ-ind-prop
-    (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
-    +-zero
-    (λ n p m → +-succ m n ∙ cong succ (p m))
-    (λ n p m → +-pred m n ∙ cong pred (p m))
++-comm = ℤₕ-ind-prop
+  (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
+  (λ n → sym (+-idʳ n))
+  (λ m p n → sym (+-succ m n) ∙ p (succ n) ∙ sym (+-succ n m))
+  (λ m p n → sym (+-pred m n) ∙ p (pred n) ∙ sym (+-pred n m))
 \end{minted}
+\caption{Agda proof of addition being commutative}
+\end{listing}
