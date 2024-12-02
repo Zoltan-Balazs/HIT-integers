@@ -123,13 +123,41 @@ Before proving the existence of an identity element, we note that in the case of
 \caption{Agda proof of addition having a right identity element}
 \end{listing}
 
-\section{Negation and Subtraction}
-\begin{minted}[fontsize=\small]{agda}
+\section{Negation and Subtraction Operations}
+Before proving the existence of an inverse element, we will have to define subtraction. To do so, we will define the negation operation, since subtraction is definitionally equal to adding the negated element: 'm - n = m + (- n)'.
+
+To define negation, we will once again use our iterator just like in the case of addition.
+
+Our method will be similar to addition as well, we will place the constructors of our element in an inverted matter (converting our equivalence using 'invEquiv', since we are required to give both proofs of equivalence) on the 'zero' base element. So when our number contains a 'pred' we will place a 'succ' on 'zero' instead, and vice-versa, if our number contains a 'succ' we will place a 'pred' on 'zero'. This will have the desired effect of resulting in the inverted original number.
+
+\begin{minted}{agda}
 -_ : ℤₕ → ℤₕ
 -_ = ℤₕ-ite zero (invEquiv succEquiv)
+-- - n = ℤₕ-ite zero (invEquiv succEquiv) n
 
+infixl 6 _-_
 _-_ : ℤₕ → ℤₕ → ℤₕ
 m - n = m + (- n)
+\end{minted}
+
+Definitionally, the following hold true for the negation operation in Agda:
+\begin{minted}{agda}
+- zero     ≡ zero
+- (succ m) ≡ pred (- m)
+- (pred m) ≡ succ (- m)
+\end{minted}
+Note that the symmetric versions of these also hold true.
+
+Alternatively, we could once again define negation by pattern matching. In this case however, for the 'sec' constructor we would have to provide 'ret' to satisfy the boundaries, for the 'ret' constructor we would have to provide 'sec' to satisfy its boundaries. Interestingly for the 'coh' constructor, we would have to provide the previously defined 'hoc' to satisfy the boundaries.
+% !!BOUNDARIES!!
+\begin{minted}{agda}
+negate : ℤₕ → ℤₕ
+negate zero        = zero
+negate (succ z)    = pred (negate z)
+negate (pred z)    = succ (negate z)
+negate (sec z i)   = ret (negate z) i
+negate (ret z i)   = sec (negate z) i
+negate (coh z i j) = hoc (negate z) i j
 \end{minted}
 
 \section{Inverse Element}
