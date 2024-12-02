@@ -144,18 +144,19 @@ _+_ = ℤₕ-ite (idfun ℤₕ) (postCompEquiv succEquiv)
   (λ m p n → cong pred (p n))
 
 +-comm : ∀ m n → m + n ≡ n + m
-+-comm m n = +-comm' n m
-  where
-  +-comm' : ∀ n m → m + n ≡ n + m
-  +-comm' = ℤₕ-ind-prop
-    (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
-    +-zero
-    (λ n p m → +-succ m n
-               ∙
-               cong succ (p m))
-    (λ n p m → +-pred m n
-               ∙
-               cong pred (p m))
++-comm = ℤₕ-ind-prop
+  (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
+  (λ n → sym (+-idʳ n))
+  (λ m p n → sym (+-succ m n)
+             ∙
+             p (succ n)
+             ∙
+             sym (+-succ n m))
+  (λ m p n → sym (+-pred m n)
+             ∙
+             p (pred n)
+             ∙
+             sym (+-pred n m))
 
 +-assoc : ∀ m n o → m + (n + o) ≡ (m + n) + o
 +-assoc = ℤₕ-ind-prop
