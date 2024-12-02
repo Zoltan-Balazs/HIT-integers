@@ -29,6 +29,13 @@ hoc = com-op isHAℤₕ
 'com-op' simply uses the previously given fields and does the work for us, if our type is right, by correctly combining paths with 'hcomp' to match the wanted boundary.
 This rule will be useful later on, when defining operations on our integer type. (Specifically when defining negation)
 
+\section{Why Cubical Agda}
+
+Since established that we want to use a Higher Inductive Type (HIT), which is not available in Martin-Löf Type Theory (MLTT). Agda, by default, doesn't support HITs as it is based on MLTT; an extension of it does however support CTT. While HoTT can essentially be summarized\cite{hottbook} by being MLTT with an additional Univalence axiom (where univalence states the following: (A ≃ B) ≃ (A = B), where A and B are types). Cubical Agda doesn't directly support HoTT; instead, it is a closely related version of Type Theory called Cubical Type Theory (CTT). CTT instead can be summarized as MLTT, with the interval type and its rules, the transport function and its rules, the glue type and hcomp. In CTT, univalence will not be an axiom but something that can be proven\cite{cohen2016cubicaltypetheoryconstructive}.
+
+Since we need to use a proof assistant that supports HITs, which CTT supports,\cite{coquand2018higherinductivetypescubical}, we are forced to use Cubical Agda\cite{10.1145/3341691}, as there are no other proof assistants that do so. This will definitionally bring the added work that we will be forced to satisfy the boundaries required, as of the writing of this paper, there is no automatic way for these to be filled, but that might be subject to change\cite{doré2024automatingboundaryfillingcubical}.
+
+The main benefit of our HIT integers will be that we can eliminate to higher dimensions (more specifically, above set, for example, to groupoid). The same could be said about Bi-Invertible integers, which use 2 'pred' constructors instead, and ditch the 'coherent' rule, however, a single 'pred' constructor with a 'coherent' rule is more elegant. There is also a definition of integers with the added 'isSet' constructor, while you could also eliminate with this version, you couldn't eliminate above set. Moreover, when defining your indunction property, you would also have to define the case for the 'isSet' constructor.
 
 \section{Commutative Ring}
 
