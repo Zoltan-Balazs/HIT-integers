@@ -3,9 +3,9 @@
 
 \section{Type Definition}
 
-In Homotopy Type Theory, we can define integers in numerous ways (one of them is using bi-invertible maps, which is a slightly less elegant version than ours\cite{10.1145/3373718.3394760}, since it involves 2 $pred$ constructors, and ditches the $coherence$ rule, in favour of being less complicated to prove properties. This bi-invertible map version is also included in the cubical Agda library\cite{biinv-agda}, which will prove useful for us), all with their own pros and cons. Following Paolo Capriotti's idea (presented by Thorsten Altenkirch\cite{bonn_2018}), our higher inductive type definition will be the following:
+In Homotopy Type Theory, we can define integers in numerous ways (one of them is using bi-invertible maps, which is a slightly less elegant version than ours\cite{10.1145/3373718.3394760}, since it involves 2 'pred' constructors, and ditches the 'coh' rule, in favour of being less complicated to prove properties. This bi-invertible map version is also included in the cubical Agda library\cite{biinv-agda}, which will prove useful for us), all with their own pros and cons. Following Paolo Capriotti's idea (presented by Thorsten Altenkirch\cite{bonn_2018}), our higher inductive type definition will be the following:
 \begin{minted}{agda}
-data ℤₕ : Set where
+data ℤₕ : Set₀ where
   zero : ℤₕ
   succ : ℤₕ → ℤₕ
   pred : ℤₕ → ℤₕ
@@ -13,7 +13,7 @@ data ℤₕ : Set where
   ret : (z : ℤₕ) → succ (pred z) ≡ z
   coh : (z : ℤₕ) → congS succ (sec z) ≡ ret (succ z)
 \end{minted}
-With this definition, we have the base element $zero$, as well as $succ$ and $pred$ as constructors, to increment and decrement the integer value respectively. We then postulate that they are inverse to each other with the inclusion of $sec$ ($section$, often seen in the Agda cubical library as $predSuc$) and $ret$ ($retraction$, often seen as $sucPred$ in the same library). With a $coh$ ($coherence$) constructor, we define an equivalence of equivalences, this constructor will introduce most of the challenges when trying to work with our integer definition. With the inclusion of this last condition, we also say that succ is a half-adjoint equivalence, something that we can use to our advantage in cubical Agda:
+With this definition, we have the base element 'zero', as well as 'succ' and 'pred' as constructors, to increment and decrement the integer value respectively. We then postulate that they are inverse to each other with the inclusion of 'sec' ('section', often seen in the Agda cubical library as 'predSuc') and 'ret' ('retraction', often seen as 'sucPred' in the same library). With a 'coh' ('coherence') constructor, we define an equivalence of equivalences, this constructor will introduce most of the challenges when trying to work with our integer definition. With the inclusion of this last condition, we also say that succ is a half-adjoint equivalence, something that we can use to our advantage in cubical Agda:
 \begin{minted}{agda}
 isHAℤₕ : isHAEquiv succ
 isHAℤₕ .isHAEquiv.g    = pred
@@ -21,13 +21,14 @@ isHAℤₕ .isHAEquiv.linv = sec
 isHAℤₕ .isHAEquiv.rinv = ret
 isHAℤₕ .isHAEquiv.com  = coh
 \end{minted}
-Using this, we can define a sort of inverse coherence rule, a coherence that inverses the equivalence by applying $pred$ to $ret$, and checking that it is equal to passing the $pred$ value to $sec$:
+Using this, we can define a sort of inverse coherence rule, a coherence that inverses the equivalence by applying 'pred' to 'ret', and checking that it is equal to passing the 'pred' value to 'sec':
 \begin{minted}{agda}
 hoc : (z : ℤₕ) → congS pred (ret z) ≡ sec (pred z)
 hoc = com-op isHAℤₕ
 \end{minted}
-$com-op$ simply uses the given fields to do the work for us, if our type is right, by filling the boundary with $hcomp$.
+'com-op' simply uses the previously given fields and does the work for us, if our type is right, by correctly combining paths with 'hcomp' to match the wanted boundary.
 This rule will be useful later on, when defining operations on our integer type. (Specifically when defining negation)
+
 
 \section{Commutative Ring}
 
