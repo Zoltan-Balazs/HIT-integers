@@ -85,11 +85,27 @@ Converting from the standard definition to our type turns out to be easier than 
 \caption{Agda code for converting between standard integers and HIT integers}
 \end{listing}
 
-\end{minted}
+\section{Converting the standard definition to our type and back}
+Converting to and from isn't enough, we have to also ensure that if we are to convert a standard integer to our type, then that value in our type back to the standard integer, we get the same initial value.
 
-\subsection{Converting our type to the standard definition and back}
-!!NEEDED!!
-\begin{minted}[fontsize=\small]{agda}
+As we did before, it is beneficial to pattern match to get the constructors of the standard integers. It turns out that if pattern match once again on the two constructors (so we get 'pos zero', 'pos (suc n)', 'negsuc zero' and 'negsuc (suc n)' cases), two of the four cases ('pos zero' and 'negsuc zero') become reflections. (Thanks to the way we defined 'ℤ→ℤₕ' and 'ℤₕ→ℤ' for the previously mentioned two cases, and 'zero' as well as 'pred zero')
+
+Let's deal with the remaining two cases:
+
+For 'pos (suc n)', we will have to prove the following: sucℤ (ℤₕ→ℤ (ℤ→ℤₕ (pos n))) ≡ pos (suc n). Note that more than likely we will need to recursively call the ℤ→ℤₕ→ℤ function with the remaining 'pos n' value, so let's do so. If we do this, suddenly we will already have the following: ℤₕ→ℤ (ℤ→ℤₕ (pos n)) ≡ pos n. Following the left-hand side, we will use congruence to apply the missing 'sucℤ' on both sides, this has the additional benefit that thanks to the definition of 'sucℤ', the right-hand side sucℤ (pos n) is definitionally equal to pos (suc n), the exact same thing we need.
+
+For 'negsuc (suc n)' the story is quite similar. We need to prove the following: predℤ (ℤₕ→ℤ (ℤ→ℤₕ (negsuc n))) ≡ negsuc (suc n), we have the intuition of the recursive call with 'negsuc n' value, doing so results in ℤₕ→ℤ (ℤ→ℤₕ (negsuc n)) ≡ negsuc n, applying 'predℤ' to match the left-hand side brings the additional benefit that definitionally predℤ (negsuc n) is equal to negsuc (suc n), exactly what we need.
+
+\begin{listing}[H]
+\begin{minted}{agda}
+ℤ→ℤₕ→ℤ : (z : ℤ) → ℤₕ→ℤ (ℤ→ℤₕ z) ≡ z
+ℤ→ℤₕ→ℤ (pos zero)       = refl
+ℤ→ℤₕ→ℤ (pos (suc n))    = cong sucℤ (ℤ→ℤₕ→ℤ (pos n))
+ℤ→ℤₕ→ℤ (negsuc zero)    = refl
+ℤ→ℤₕ→ℤ (negsuc (suc n)) = cong predℤ (ℤ→ℤₕ→ℤ (negsuc n))
+\end{minted}
+\caption{Agda proof that converting standard integers to HIT integers and back results in the same value}
+\end{listing}
 ℤ-ℤₕ-sucℤ : (z : ℤ) → ℤ-ℤₕ (sucℤ z) ≡ succ (ℤ-ℤₕ z)
 ℤ-ℤₕ-sucℤ (pos n)          = refl
 ℤ-ℤₕ-sucℤ (negsuc zero)    = sym (ret (ℤ-ℤₕ (pos zero)))
