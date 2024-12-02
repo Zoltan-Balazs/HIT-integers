@@ -14,6 +14,10 @@ open isHAEquiv
 congS₂ : {ℓ ℓ' ℓ'' : Level} {A : Type ℓ} {B : Type ℓ'} {C : Type ℓ''}
          (f : A → B → C) {x y : A} {x' y' : B} → x ≡ y → x' ≡ y' → f x x' ≡ f y y'
 congS₂ f e1 e2 i = f (e1 i) (e2 i)
+cohℤ : ∀ z → congS sucℤ (predSuc z) ≡ sucPred (sucℤ z)
+cohℤ (pos n)          = refl
+cohℤ (negsuc zero)    = refl
+cohℤ (negsuc (suc n)) = refl
 
 -- Higher inductive type definition of ℤ
 data ℤₕ : Set where
@@ -33,24 +37,15 @@ isHAℤₕ .isHAEquiv.com  = coh
 hoc : (z : ℤₕ) → congS pred (ret z) ≡ sec (pred z)
 hoc = com-op isHAℤₕ
 
-ℤₕ-ℤ : ℤₕ → ℤ
-ℤₕ-ℤ zero        = pos zero
-ℤₕ-ℤ (succ x)    = sucℤ (ℤₕ-ℤ x)
-ℤₕ-ℤ (pred x)    = predℤ (ℤₕ-ℤ x)
-ℤₕ-ℤ (sec x i)   = predSuc (ℤₕ-ℤ x) i
-ℤₕ-ℤ (ret x i)   = sucPred (ℤₕ-ℤ x) i
-ℤₕ-ℤ (coh x i j) = isSetℤ
-  (sucℤ (predℤ (sucℤ (ℤₕ-ℤ x))))
-  (sucℤ (ℤₕ-ℤ x))
-  (congS sucℤ (predSuc (ℤₕ-ℤ x)))
-  (sucPred (sucℤ (ℤₕ-ℤ x)))
-  i j
+-- Converting HIT Integers to Standard Integers
+ℤₕ→ℤ : ℤₕ → ℤ
+ℤₕ→ℤ zero        = pos zero
+ℤₕ→ℤ (succ z)    = sucℤ (ℤₕ→ℤ z)
+ℤₕ→ℤ (pred z)    = predℤ (ℤₕ→ℤ z)
+ℤₕ→ℤ (sec z i)   = predSuc (ℤₕ→ℤ z) i
+ℤₕ→ℤ (ret z i)   = sucPred (ℤₕ→ℤ z) i
+ℤₕ→ℤ (coh z i j) = cohℤ (ℤₕ→ℤ z) i j
 
-ℤ-ℤₕ : ℤ → ℤₕ
-ℤ-ℤₕ (pos zero)       = zero
-ℤ-ℤₕ (pos (suc n))    = succ (ℤ-ℤₕ (pos n))
-ℤ-ℤₕ (negsuc zero)    = pred zero
-ℤ-ℤₕ (negsuc (suc n)) = pred (ℤ-ℤₕ (negsuc n))
 
 ℤ-ℤₕ-sucℤ : (z : ℤ) → ℤ-ℤₕ (sucℤ z) ≡ succ (ℤ-ℤₕ z)
 ℤ-ℤₕ-sucℤ (pos n) = refl
