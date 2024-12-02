@@ -114,8 +114,11 @@ _+_ : ℤₕ → ℤₕ → ℤₕ
 _+_ = ℤₕ-ite (idfun ℤₕ) (postCompEquiv succEquiv)
 -- m + n = (ℤₕ-ite (idfun ℤₕ) (postCompEquiv succEquiv) m) n
 
-+-zero : ∀ z → z + zero ≡ z
-+-zero = ℤₕ-ind-prop
++-idˡ : ∀ z → zero + z ≡ z
++-idˡ z = refl
+
++-idʳ : ∀ z → z + zero ≡ z
++-idʳ = ℤₕ-ind-prop
   (λ _ → isSetℤₕ _ _)
   refl
   (λ z p → cong succ p)
@@ -307,7 +310,7 @@ m * n = ℤₕ-ite zero (Equiv-n+-ℤₕ n) m
              sym (*-pred n m))
 
 *-idˡ : ∀ z → succ zero * z ≡ z
-*-idˡ = +-zero
+*-idˡ = +-idʳ
 
 *-idʳ : ∀ z → z * succ zero ≡ z
 *-idʳ z =
@@ -315,26 +318,26 @@ m * n = ℤₕ-ite zero (Equiv-n+-ℤₕ n) m
   ∙
   *-idˡ z
 
-*-distribʳ-+ : ∀ m n o → (m * o) + (n * o) ≡ (m + n) * o
-*-distribʳ-+ = ℤₕ-ind-prop
+*-distribˡ-+ : ∀ m n o → (m + n) * o ≡ (m * o) + (n * o)
+*-distribˡ-+ = ℤₕ-ind-prop
   (λ _ → isPropΠ2 λ _ _ → isSetℤₕ _ _)
   (λ n o → refl)
-  (λ m p n o → sym (+-assoc o (m * o) (n * o))
+  (λ m p n o → cong (o +_) (p n o)
                ∙
-               cong (o +_) (p n o))
-  (λ m p n o → sym (+-assoc (- o) (m * o) (n * o))
+               +-assoc o (m * o) (n * o))
+  (λ m p n o → cong (- o +_) (p n o)
                ∙
-               cong (- o +_) (p n o))
+               +-assoc (- o) (m * o) (n * o))
 
-*-distribˡ-+ : ∀ o m n → (o * m) + (o * n) ≡ o * (m + n)
-*-distribˡ-+ o m n =
-  cong (_+ o * n) (*-comm o m)
+*-distribʳ-+ : ∀ m n o → m * (n + o) ≡ (m * n) + (m * o)
+*-distribʳ-+ m n o =
+  *-comm m (n + o)
   ∙
-  cong (m * o +_) (*-comm o n)
+  *-distribˡ-+ n o m
   ∙
-  *-distribʳ-+ m n o
+  cong (n * m +_) (*-comm o m)
   ∙
-  *-comm (m + n) o
+  cong (_+ m * o) (*-comm n m)
 
 *-inv : ∀ m n → m * (- n) ≡ - (m * n)
 *-inv = ℤₕ-ind-prop
@@ -362,13 +365,13 @@ inv-* m n =
   (λ m p n o →
     cong (n * o +_) (p n o)
     ∙
-    *-distribʳ-+ n (m * n) o)
+    sym (*-distribˡ-+ n (m * n) o))
   (λ m p n o →
     cong (- (n * o) +_) (p n o)
     ∙
     cong (_+ m * n * o) (sym (inv-* n o))
     ∙
-    *-distribʳ-+ (- n) (m * n) o)
+    sym (*-distribˡ-+ (- n) (m * n) o))
 
 AbGroupℤₕ+ : IsAbGroup {lzero} {ℤₕ} zero _+_ (-_)
 AbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.isMonoid .IsMonoid.isSemigroup .IsSemigroup.is-set = isSetℤₕ
@@ -388,8 +391,8 @@ Monoidℤₕ* .IsMonoid.·IdL = *-idˡ
 Ringℤₕ*+ : IsRing {lzero} {ℤₕ} zero (succ zero) _+_ _*_ (-_)
 Ringℤₕ*+ .IsRing.+IsAbGroup = AbGroupℤₕ+
 Ringℤₕ*+ .IsRing.·IsMonoid = Monoidℤₕ*
-Ringℤₕ*+ .IsRing.·DistR+ = λ m n o → sym (*-distribˡ-+ m n o)
-Ringℤₕ*+ .IsRing.·DistL+ = λ m n o → sym (*-distribʳ-+ m n o)
+Ringℤₕ*+ .IsRing.·DistR+ = *-distribʳ-+
+Ringℤₕ*+ .IsRing.·DistL+ = *-distribˡ-+
 
 CommRingℤₕ*+ : IsCommRing {lzero} {ℤₕ} zero (succ zero) _+_ _*_ (-_)
 CommRingℤₕ*+ .IsCommRing.isRing = Ringℤₕ*+
