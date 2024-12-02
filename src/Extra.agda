@@ -28,13 +28,51 @@ private
   convert-neg (suc n) = pred (convert-neg n)
 
 instance
-  ℤₕ-Num : Number ℤₕ
-  Constraint ℤₕ-Num _ =  Unit
-  fromNat ℤₕ-Num n = convert n
+-- Remaining proof that ℤₕ is a set
+ℤ→ℤₕ-sucPredSuc : (z : ℤ) → ℤ→ℤₕ (sucℤ (predℤ (sucℤ z))) ≡ succ (pred (succ (ℤ→ℤₕ z)))
+ℤ→ℤₕ-sucPredSuc z = ℤ→ℤₕ-sucℤ (predℤ (sucℤ z)) ∙ congS succ (ℤ→ℤₕ-predℤ (sucℤ z) ∙ congS pred (ℤ→ℤₕ-sucℤ z))
 
-  ℤₕ-Neg : Negative ℤₕ
-  Constraint ℤₕ-Neg _ = Unit
-  fromNeg ℤₕ-Neg n = convert-neg n
+ℤ→ℤₕ-sucPredSuc-Path : (z : ℤ) → PathP (λ i → ℤ→ℤₕ (sucPred (sucℤ z) i) ≡ succ (sec (ℤ→ℤₕ z) i))
+                                       (ℤ→ℤₕ-sucℤ (predℤ (sucℤ z)) ∙ congS succ (ℤ→ℤₕ-predℤ (sucℤ z) ∙ congS pred (ℤ→ℤₕ-sucℤ z)))
+                                       (ℤ→ℤₕ-sucℤ z)
+ℤ→ℤₕ-sucPredSuc-Path z i j = {!!}
+
+succsec-sucPredSuc : (z : ℤ) → (i : I) → succ (sec (ℤ→ℤₕ z) i) ≡ ℤ→ℤₕ (sucPred (sucℤ z) i)
+succsec-sucPredSuc z i j = hcomp (λ k → λ { (i = i0) → ℤ→ℤₕ-sucPredSuc z (~ j)
+                                          ; (i = i1) → ℤ→ℤₕ-sucℤ z (~ j)
+                                          ; (j = i0) → succ (sec (ℤ→ℤₕ z) i)
+                                          ; (j = i1) → ℤ→ℤₕ (sucPred (sucℤ z) i)
+                                          }) {!!}
+
+{-
+       101 y-----------y 111
+          /|          /|
+         / |         / |
+        /  |        /  |
+       /   |       /   |
+  001 x-----------y 011|
+      |    |      |    |
+      |    |      |    |
+      |100 y------|----y 110
+      |   /       |   /
+      |  /        |  /
+      | /         | /
+      |/          |/
+  000 y-----------y 010
+-}
+
+ℤ→ℤₕ-coh : (z : ℤ) → Cube
+             (λ j k → ℤ→ℤₕ-sucPredSuc-Path z j k)
+             (λ j k → hcomp (λ l → λ { (j = i0) → ℤ→ℤₕ-sucPredSuc z k
+                                     ; (j = i1) → ℤ→ℤₕ-sucℤ z k
+                                     ; (k = i0) → ℤ→ℤₕ (cohℤ z (~ l) j)
+                                     ; (k = i1) → coh (ℤ→ℤₕ z) l j
+                                     }) (succsec-sucPredSuc z j (~ k)) )
+             (λ i k → ℤ→ℤₕ-sucPredSuc z k)
+             (λ i k → ℤ→ℤₕ-sucℤ z k)
+             (λ i j → ℤ→ℤₕ (cohℤ z (~ i) j))
+             (λ i j → coh (ℤ→ℤₕ z) i j)
+ℤ→ℤₕ-coh z i j k = {!!}
 
 -- Relations
 _≡ᶻ_ : ℤₕ → ℤₕ → Bool
