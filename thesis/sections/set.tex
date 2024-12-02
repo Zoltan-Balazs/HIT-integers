@@ -71,16 +71,20 @@ Rewriting these wanted boundaries in Agda to a Square results in the following:
 \end{minted}
 \caption{Agda code for converting between HIT and the standard integers}
 \end{listing}
-\end{minted}
 
-\subsection{Converting the standard definition to our type and back}
-!!NEEDED!!
-\begin{minted}[fontsize=\small]{agda}
-ℤ-ℤₕ-ℤ : (z : ℤ) → ℤₕ-ℤ (ℤ-ℤₕ z) ≡ z
-ℤ-ℤₕ-ℤ (ℤ.pos zero)     = refl
-ℤ-ℤₕ-ℤ (ℤ.pos (suc n))  = cong sucℤ (ℤ-ℤₕ-ℤ (ℤ.pos n))
-ℤ-ℤₕ-ℤ (negsuc zero)    = refl
-ℤ-ℤₕ-ℤ (negsuc (suc n)) = cong predℤ (ℤ-ℤₕ-ℤ (negsuc n))
+\section{Converting the standard definition to our type}
+Converting from the standard definition to our type turns out to be easier than the vice-versa. Pattern matching on both parameters (the default 'n' parameter, then the expanded 'pos n' and 'negsuc n' parameter) introduces four cases. We need to remember that 'pos zero' is equivalent to our 'zero' constructor, 'pos (suc n)' is equivalent to applying our 'succ' constructor, to the recursively converted 'pos n' value. 'negsuc' is an interesting case, as it is definitionally introduces '-1' to the value, so 'negsuc zero' is equivalent to '0 - 1', which is our 'pred zero', equivalently, 'negsuc (suc n)' is equivalent to applying 'pred' to the recursively converted 'negsuc n' value.
+\begin{listing}[H]
+\begin{minted}{agda}
+ℤ→ℤₕ : ℤ → ℤₕ
+ℤ→ℤₕ (pos zero)       = zero
+ℤ→ℤₕ (pos (suc n))    = succ (ℤ→ℤₕ (pos n))
+ℤ→ℤₕ (negsuc zero)    = pred zero
+ℤ→ℤₕ (negsuc (suc n)) = pred (ℤ→ℤₕ (negsuc n))
+\end{minted}
+\caption{Agda code for converting between standard integers and HIT integers}
+\end{listing}
+
 \end{minted}
 
 \subsection{Converting our type to the standard definition and back}
