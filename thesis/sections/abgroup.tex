@@ -161,28 +161,103 @@ negate (coh z i j) = hoc (negate z) i j
 \end{minted}
 
 \section{Inverse Element}
-\begin{minted}[fontsize=\small]{agda}
+We note that in the case of addition, both left and right inverse element will be the negated number.
+For proving the existence of left and right inverse elements, we will first prove 2 helper theorems:
+
+\begin{theorem}
+  The succ constructor can be moved around addition: ∀ m, n ∈ ℤ: m + succ n = succ (m + n)
+\end{theorem}
+
+\begin{proof}
+  Using our induction property:
+
+  For the base case (m = 0): 0 + (succ n) = succ (0 + n) is a reflection.
+
+  For the succ case: (succ m) + (succ n) = succ ((succ m) + n), since we have the original equality of m + (succ n) = succ (m + n), it is enough to apply succ on both sides of the original equality, this results in succ (m + succ n) = succ (succ (m + n)), thanks to the fact that succ (m + n) = succ m + n holds definitionally, this case is proven.
+
+  For the pred case: (pred m) + (succ n) = succ ((pred m) + n), since we have the original equality, we can apply pred on both sides of it. Unfortunately, this won't be enough, since this way we have the equation of pred (m + succ n) = pred (succ (m + n)), our right-hand sides don't match. We will have to use transitivity to change the right-hand side of the equation. We know that our section constructor states that pred (succ m) = m, applying this with 'm + n' gets rid of the pred (succ (...)) part, resulting in pred (m + succ n) = m + n. Using another transitivity, we will have to somehow put a succ (pred (...)) to this 'm + n'. This is just going to be the symmetric version of our retraction constructor, which states that succ (pred (m)) = m. This results in pred (m + succ n) = succ (pred (m + n)), thanks to the fact that pred (m + n) = pred m + n is definitionally true, this case is also proven.
+\end{proof}
+
+\begin{listing}[H]
+\begin{minted}{agda}
 +-succ : ∀ m n → m + succ n ≡ succ (m + n)
 +-succ = ℤₕ-ind-prop
   (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
   (λ m → refl)
   (λ m p n → cong succ (p n))
   (λ m p n → cong pred (p n) ∙ sec (m + n) ∙ sym (ret (m + n)))
+\end{minted}
+\caption{Agda proof of moving succ around addition}
+\end{listing}
 
+\begin{theorem}
+  The pred constructor can be moved around addition: ∀ m, n ∈ ℤ: m + pred n = pred (m + n)
+\end{theorem}
+
+\begin{proof}
+  Using our induction property:
+
+  For the base case (m = 0): 0 + (pred n) = pred (0 + n) is a reflection.
+
+  For the succ case: (succ m) + (pred n) = pred ((succ m) + n), since we have the original equality, we can apply succ on both sides of it. Unfortunately, this won't be enough, since this way we have the equation of succ (m + pred n) = succ (pred (m + n)), our right-hand sides don't match. We will have to use transitivity to change the right-hand side of the equation. We know that our retraction constructor states that succ (pred m) = m, applying this with 'm + n' gets rid of the succ (pred (...)) part, resulting in succ (m + pred n) = m + n. Using another transitivity, we will have to somehow put a pred (succ (...)) to this 'm + n'. This is just going to be the symmetric version of our section constructor, which states that pred (succ (m)) = m. This results in succ (m + pred n) = pred (succ (m + n)), thanks to the fact that succ (m + n) = succ m + n is definitionally true, this case is proven.
+
+  For the pred case: (pred m) + (pred n) = pred ((pred m) + n), since we have the original equality of m + (pred n) = pred (m + n), it is enough to apply pred on both sides of the original equality, this results in pred (m + pred n) = pred (pred (m + n)), thanks to the fact that pred (m + n) = pred m + n is definitionally true, this case is also proven.
+\end{proof}
+
+\begin{listing}[H]
+\begin{minted}{agda}
 +-pred : ∀ m n → m + pred n ≡ pred (m + n)
 +-pred = ℤₕ-ind-prop
   (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
   (λ m → refl)
   (λ m p n → cong succ (p n) ∙ ret (m + n) ∙ sym (sec (m + n)))
   (λ m p n → cong pred (p n))
+\end{minted}
+\caption{Agda proof of moving pred around addition}
+\end{listing}
 
+\begin{theorem}
+  Left inverse element exists for addition: ∀ z ∈ ℤ, ∃ inv ∈ ℤ: inv + z = 0
+\end{theorem}
+
+\begin{proof}
+  In Agda, we will rewrite the statement as such: ∀ z ∈ ℤ → (- z) + z = 0, since we know that the inverse element is the negated number.
+
+  For the base case (z = 0): (- 0) + 0 = 0 is a reflection.
+
+  For the succ case: (- (succ z)) + (succ z) = 0. Definitionally, we know that - (succ m) = pred (- m), we can use this fact, by applying pred to the previously proven +-succ, with '- z' and 'z' parameters. This results in the equation pred ((- z) + succ z) ≡ pred (succ ((- z) + z)). Due to the previous note and the fact that definitionally pred (m + n) = pred m + n, our left hand side is correct. Using transitivity, we can get rid of the pred (succ (...)) part on the right-hand side by using the section constructor, resulting in pred ((- z) + succ z) ≡ (- z) + z. Using another transivitiy, our remaining right-hand side is just our original equation. Applying it, this case is proven.
+
+  For the pred case: (- (pred z)) + (pred z) = 0. Definitionally, we know that - (pred m) = succ (- m), we can use this fact, by applying pred to the previously proven +-pred, with '- z' and 'z' parameters. This results in the equation succ ((- z) + pred z) ≡ succ (pred ((- z) + z)). Due to the previous note and the fact that definitionally succ (m + n) = succ m + n, our left hand side is correct. Using transitivity, we can get rid of the succ (pred (...)) part on the right-hand side by using the retraction constructor, resulting in succ ((- z) + pred z) ≡ (- z) + z. Using another transivitiy, our remaining right-hand side is just our original equation. Applying it, this case is also proven.
+\end{proof}
+
+\begin{listing}[H]
+\begin{minted}{agda}
 +-invˡ : ∀ z → (- z) + z ≡ zero
 +-invˡ = ℤₕ-ind-prop
   (λ _ → isSetℤₕ _ _)
   refl
   (λ z p → cong pred (+-succ (- z) z) ∙ sec _ ∙ p)
   (λ z p → cong succ (+-pred (- z) z) ∙ ret _ ∙ p)
+\end{minted}
+\caption{Agda proof of addition having a left inverse element}
+\end{listing}
 
+\begin{theorem}
+  Right inverse element exists for addition: ∀ z ∈ ℤ, ∃ inv ∈ ℤ: inv + z = 0
+\end{theorem}
+
+\begin{proof}
+  As in the case of the left identity element, we will rewrite this statement in Agda as such: ∀ z ∈ ℤ → z + (- z) = 0.
+
+  For the base case (z = 0): 0 + (- 0) = 0 is once again a reflection.
+
+  For the succ case: (succ z) + (- (succ z)) = 0. Definitionally, we know that - (succ m) = pred (- m), we can use this fact, by applying succ to the previously proven +-pred, with 'z' and '- z' parameters. This results in the equation succ (z + pred (- z)) ≡ succ (pred (z + (- z))). Due to the previous note and the fact that definitionally succ (m + n) = succ m + n, our left hand side is correct. Using transitivity, we can get rid of the succ (pred (...)) part on the right-hand side by using the retraction constructor, resulting in succ (z + pred (- z)) ≡ z + (- z). Using another transivitiy, our remaining right-hand side is just our original equation. Applying it, this case is proven.
+
+  For the pred case: (pred z) + (- (pred z)) = 0. Definitionally, we know that - (pred m) = succ (- m), we can use this fact, by applying pred to the previously proven +-succ, with 'z' and '- z' parameters. This results in the equation pred (z + succ (- z)) ≡ pred (succ (z + (- z))). Due to the previous note and the fact that definitionally pred (m + n) = pred m + n, our left hand side is correct. Using transitivity, we can get rid of the pred (succ (...)) part on the right-hand side by using the section constructor, resulting in pred (z + succ (- z)) ≡ z + (- z). Using another transivitiy, our remaining right-hand side is just our original equation. Applying it, this case is also proven.
+\end{proof}
+
+\begin{listing}[H]
+\begin{minted}{agda}
 +-invʳ : ∀ z → z + (- z) ≡ zero
 +-invʳ = ℤₕ-ind-prop
   (λ _ → isSetℤₕ _ _)
@@ -190,6 +265,8 @@ negate (coh z i j) = hoc (negate z) i j
   (λ z p → cong succ (+-pred z (- z)) ∙ ret _ ∙ p)
   (λ z p → cong pred (+-succ z (- z)) ∙ sec _ ∙ p)
 \end{minted}
+\caption{Agda proof of addition having a right inverse element}
+\end{listing}
 
 \section{Commutativity}
 \begin{minted}[fontsize=\small]{agda}
