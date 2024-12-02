@@ -93,6 +93,11 @@ open import Base
       (λ _ → rinv isHA)
       (λ _ → com isHA)
 
+-- Addition and its properties
+-- Definitionally the following hold true for addition:
+-- zero   + n = n
+-- succ m + n = succ (m + n)
+-- pred m + n = pred (m + n)
 succIso : Iso ℤₕ ℤₕ
 succIso .Iso.fun      = succ
 succIso .Iso.inv      = pred
@@ -107,6 +112,7 @@ infixl 7 _*_
 
 _+_ : ℤₕ → ℤₕ → ℤₕ
 _+_ = ℤₕ-ite (idfun ℤₕ) (postCompEquiv succEquiv)
+-- m + n = (ℤₕ-ite (idfun ℤₕ) (postCompEquiv succEquiv) m) n
 
 +-zero : ∀ z → z + zero ≡ z
 +-zero = ℤₕ-ind-prop
