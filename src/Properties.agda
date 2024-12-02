@@ -240,8 +240,11 @@ Iso.leftInv (Iso-n+-ℤₕ n) m =
 isEquiv-n+-ℤₕ : ∀ z → isEquiv (z +_)
 isEquiv-n+-ℤₕ z = isoToIsEquiv (Iso-n+-ℤₕ z)
 
+Equiv-n+-ℤₕ : (z : ℤₕ) → ℤₕ ≃ ℤₕ
+Equiv-n+-ℤₕ z = z +_ , isEquiv-n+-ℤₕ z
+
 _*_ : ℤₕ → ℤₕ → ℤₕ
-m * n = ℤₕ-ite zero (n +_ , isEquiv-n+-ℤₕ n) m
+m * n = ℤₕ-ite zero (Equiv-n+-ℤₕ n) m
 
 *-zero : ∀ z → z * zero ≡ zero
 *-zero = ℤₕ-ind-prop
