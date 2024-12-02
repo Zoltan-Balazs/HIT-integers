@@ -108,9 +108,14 @@ To prove that multiplication is commutative, we will need to first prove 3 helpe
 \caption{Agda proof of multiplication being commutative}
 \end{listing}
 
+\begin{listing}[H]
 \section{Putting it All Together}
-\begin{minted}[fontsize=\small]{agda}
-AbGroupℤₕ+ : IsAbGroup {lzero} {ℤₕ} zero _+_ (-_)
+For all of the proven cases (Abelian Group, Monoid, Ring, Commutative Ring), Cubical Agda has data types. When defining the types of these, we also have to give the identity elements, the operation it is applicable on (negation is implicitly required, thanks to the inverse element's proof) and which type we are defining these on. Defining the data type itself requires the previously proven properties, as well as the set property as fields.
+As this type checks, we can be sure that our higher inductive type integers do, indeed, form a commutative ring.
+Interestingly enough, there exists a 'makeIsCommRing' function, looking at it, we could've just proven the 'right' version of all properties (addition having an identity and inverse element, multiplication having an id element, and being right distributive to addition) as it is possible to infer the 'left' version of these properties.
+
+\begin{minted}{agda}
+AbGroupℤₕ+ : IsAbGroup {A = ℤₕ} zero _+_ (-_)
 AbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.isMonoid .IsMonoid.isSemigroup .IsSemigroup.is-set = isSetℤₕ
 AbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.isMonoid .IsMonoid.isSemigroup .IsSemigroup.·Assoc = +-assoc
 AbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.isMonoid .IsMonoid.·IdR = +-idʳ
@@ -119,19 +124,23 @@ AbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.·InvR = +-invʳ
 AbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.·InvL = +-invˡ
 AbGroupℤₕ+ .IsAbGroup.+Comm = +-comm
 
-Monoidℤₕ* : IsMonoid {lzero} {ℤₕ} (succ zero) _*_
+Monoidℤₕ* : IsMonoid {A = ℤₕ} (succ zero) _*_
 Monoidℤₕ* .IsMonoid.isSemigroup .IsSemigroup.is-set = isSetℤₕ
 Monoidℤₕ* .IsMonoid.isSemigroup .IsSemigroup.·Assoc = *-assoc
 Monoidℤₕ* .IsMonoid.·IdR = *-idʳ
 Monoidℤₕ* .IsMonoid.·IdL = *-idˡ
 
-Ringℤₕ*+ : IsRing {lzero} {ℤₕ} zero (succ zero) _+_ _*_ (-_)
+Ringℤₕ*+ : IsRing {R = ℤₕ} zero (succ zero) _+_ _*_ (-_)
 Ringℤₕ*+ .IsRing.+IsAbGroup = AbGroupℤₕ+
 Ringℤₕ*+ .IsRing.·IsMonoid = Monoidℤₕ*
-Ringℤₕ*+ .IsRing.·DistR+ = λ m n o → sym (*-distribˡ-+ m n o)
-Ringℤₕ*+ .IsRing.·DistL+ = λ m n o → sym (*-distribʳ-+ m n o)
+Ringℤₕ*+ .IsRing.·DistR+ = *-distribʳ-+
+Ringℤₕ*+ .IsRing.·DistL+ = *-distribˡ-+
 
-CommRingℤₕ*+ : IsCommRing {lzero} {ℤₕ} zero (succ zero) _+_ _*_ (-_)
+CommRingℤₕ*+ : IsCommRing {R = ℤₕ} zero (succ zero) _+_ _*_ (-_)
 CommRingℤₕ*+ .IsCommRing.isRing = Ringℤₕ*+
 CommRingℤₕ*+ .IsCommRing.·Comm = *-comm
 \end{minted}
+\caption{Definition of the Commutative Ring property for HIT Integers}
+\end{listing}
+
+With this defined, we can use this with the existing commutative ring solver tactic defined in the cubical library. What this essentially means is that any equation using only multiplication, addition and negation can be trivially solved. See the examples source file for an example of this.
