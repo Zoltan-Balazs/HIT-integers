@@ -130,13 +130,18 @@ m % (succ n) = mod-helper zero n m n
 \end{minted}
 
 \section{Exponentiation}
-!!NEEDED!!
-\begin{minted}[fontsize=\small]{agda}
+Exponentiation is an interesting topic when talking about integers. First of all, our type definition seems out of place, as our second parameter is not an integer, but a natural number. From elemenary school, we know that raising an integer to a negative power is equivalent to 1 divided by the integer to the absolute value of the power. This number is usually not an integer, so we need to strictly ensure that our exponent is a non-negative number.
+This restriction (along with our non-exhaustive division operation resulting in us not able to give a correct reversible operation to multiplication) results in us not being able to use our iterator to define this operation, we need to pattern match once again.
+As usual, defining the results of our 1- and 2-dimensional constructors ('sec', 'ret' and 'coh') is quite laborous. For this reason, we will only define the 0-dimensional constructors and our base element:
+\begin{minted}{agda}
 infixr 8 _^^_
 
 _^^_ : ℤₕ → ℕ → ℤₕ
-a ^^ zero = succ zero
-zero ^^ suc b = zero
+a          ^^ zero  = succ zero
+zero       ^^ suc b = zero
 x@(succ a) ^^ suc b = x * (x ^^ b)
 x@(pred a) ^^ suc b = x * (x ^^ b)
 \end{minted}
+With this operation defined, we could prove properties of exponentiation, for example: products of powers: $a^m \cdot a^n = a^{m+n}$, power of a power: $(a^m)^n = a^{m^n}$, power of a product: $(a \cdot b)^m = a^m \cdot b^m$.
+Other properties of exponentiation require division, which, as we described, is non reversible.
+Unfortunately, since our second parameter is not an integer, we cannot use our induction property to prove the before-mentioned properties, we would need to pattern match, which, once again, would introduce the need to prove the cases for our 1- and 2-dimensional constructors, for which we haven't defined what the exponentiation operation is, so it would be an impossible task.
