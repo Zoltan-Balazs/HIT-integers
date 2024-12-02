@@ -104,17 +104,49 @@ coh a i j * b = ?
 \end{listing}
 
 \section{Multiplication Distributes over Addition}
-\begin{minted}[fontsize=\small]{agda}
-*-distribʳ-+ : ∀ m n o → (m * o) + (n * o) ≡ (m + n) * o
-*-distribʳ-+ = ℤₕ-ind-prop
+As was the case for the identity element and inverse element proofs, we will have to prove both the left and right side for distributivity.
+
+\begin{theorem}
+  Multiplication is distributive over addition on the left side: ∀ m, n, o ∈ ℤ: (m + n) * o = (m * o) + (n * o)
+\end{theorem}
+
+\begin{proof}
+  Using our induction property:
+
+  For the base case (m = 0) : (0 + n) * o = (0 * o) + (n * o) is a reflection.
+
+  For the succ case: ((succ m) + n) * o = ((succ m) * o) + (n * o). Definitionally, we know that (succ m) * o = o + m * o, as such, our equation is essentially the same as: o + (m * n) * o = o + (m * o) + (n * o). For the left-hand side of the equation, we will note that disregarding the beginning o + part, the equation is the same as the original equality's left-hand side, using congruence, we can substitute on the left-hand side. Using this, our right-hand side will look like this: o + (m * o + n * o), this is almost the exact thing that is on the right-hand side, apart from the fact that addition is paranthesized from the left (our original o + (m * n) + (n * o) = (o + (m * n)) + (n * o)), using the associative property of addition, we can rearrange the parts to be correctly parenthesized.
+
+  For the pred case: ((pred m) + n) * o = ((pred m) * o) + (n * o). Once again, definitionally we know that (pred m) * o = (- o) + m * o. We can rewrite the equation once again as: - o + (m * n) * o = - o + (m * o) + (n * o). We can use the exact same steps as in the succ case (Using transitivity, rewriting the left-hand side using congruence and the original equality, rewriting the right hand side with the associative property of addition), noting the difference that for congruence and the first part of the associative property of addition, we will have to provide '- o' as a parameter instead of 'o'.
+\end{proof}
+
+\begin{listing}[H]
+\begin{minted}{agda}
+*-distribˡ-+ : ∀ m n o → (m + n) * o ≡ (m * o) + (n * o)
+*-distribˡ-+ = ℤₕ-ind-prop
   (λ _ → isPropΠ2 λ _ _ → isSetℤₕ _ _)
   (λ n o → refl)
-  (λ m p n o → sym (+-assoc o (m * o) (n * o)) ∙ cong (o +_) (p n o))
-  (λ m p n o → sym (+-assoc (- o) (m * o) (n * o)) ∙ cong (- o +_) (p n o))
-
-*-distribˡ-+ : ∀ o m n → (o * m) + (o * n) ≡ o * (m + n)
-*-distribˡ-+ o m n = cong (_+ o * n) (*-comm o m) ∙ cong (m * o +_) (*-comm o n) ∙ *-distribʳ-+ m n o ∙ *-comm (m + n) o
+  (λ m p n o → cong (o +_) (p n o) ∙ +-assoc o (m * o) (n * o))
+  (λ m p n o → cong (- o +_) (p n o) ∙ +-assoc (- o) (m * o) (n * o))
 \end{minted}
+\caption{Agda proof of multiplication being left distributive to addition}
+\end{listing}
+
+\begin{theorem}
+  Multiplication is distributive over addition on the right side: ∀ m, n, o ∈ ℤ: m * (n + o) = (m * n) + (m * o)
+\end{theorem}
+
+\begin{proof}
+  Using the commutative property of multiplication, we can rewrite m * (n + o) to (n + o) * m, this equation looks the same as the left-hand side our previous theorem (multiplication is distributive over addition on the left side). Applying it, with the correct parameters (n, o, m as 'm', 'n' and 'o' respectively), we get the equation of n * m + o * m. These are the exact parts that we need, we will just need to use the commutative property of multiplication twice to switch around the terms. (Note: we can use the congruences in any way, i.e. it doesn't matter if the rearrange the left or the right part first.)
+\end{proof}
+
+\begin{listing}[H]
+\begin{minted}{agda}
+*-distribʳ-+ : ∀ m n o → m * (n + o) ≡ (m * n) + (m * o)
+*-distribʳ-+ m n o = *-comm m (n + o) ∙ *-distribˡ-+ n o m ∙ cong (n * m +_) (*-comm o m) ∙ cong (_+ m * o) (*-comm n m)
+\end{minted}
+\caption{Agda proof of multiplication being right distributive to addition}
+\end{listing}
 
 \section{Associative}
 \begin{minted}[fontsize=\small]{agda}
