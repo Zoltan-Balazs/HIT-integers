@@ -149,28 +149,89 @@ As was the case for the identity element and inverse element proofs, we will hav
 \end{listing}
 
 \section{Associative}
-\begin{minted}[fontsize=\small]{agda}
+Before proving that multiplication is associative, we will prove 3 helper theorems.
+
+\begin{theorem}
+  Negating an addition is equal to negating the parts separately, and then adding them together. ∀ m, n ∈ ℤ: - (m + n) = (- m) + (- n)
+\end{theorem}
+
+\begin{proof}
+  Using our induction property:
+
+  For the base case (m = 0): - (0 + n) = (- 0) + (- n) is a reflection.
+
+  For the succ case: - ((succ m) + n) = (- (succ m)) + (- n). Note that we have our original equality of - (m + n) = (- m) + (- n). Definitonally - (succ m) = pred (- m), since it doesn't matter if we increase the value, then negate it, or if we negate it and decrement it. Rewriting our case this way results in: pred (- (m + n)) = (pred (- m)) + (-n), that we need to prove. This way, applying pred to both sides of the original equality, we prove this case.
+
+  For the pred case: - ((pred m) + n) = (- (pred m)) + (- n). Similarly to the succ case, we have our original equality. Definitionally - (pred m) = succ (- m). Rewriting our case this way results in: succ (- (m + n)) = (succ (- m)) + (- n), that we need to prove. So, similarly to the succ case, we can apply succ to both sides of the original equality, proving this case as well.
+\end{proof}
+
+\begin{minted}{agda}
 inv-hom-ℤₕ : ∀ m n → - (m + n) ≡ (- m) + (- n)
 inv-hom-ℤₕ = ℤₕ-ind-prop
   (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
   (λ n → refl)
   (λ m p n → cong pred (p n))
   (λ m p n → cong succ (p n))
+\end{minted}
 
+\begin{theorem}
+  Multiplying a number ('m') by a right negated number ('- n') is the same as multiplying the non-negated numbers first ('m * n'), and negating the result. ∀ m, n ∈ ℤ: m * (- n) = - (m * n)
+\end{theorem}
+
+\begin{proof}
+  Using our induction property:
+
+  For the base case (m = 0): 0 * (- n) = - (0 * n) is a reflection.
+
+  For the succ case: (succ m) * (- n) = - ((succ m) * n). Definitionally succ m * (- n) = (- n) + m * (- n). The m * (- n) part is the left-hand side of our original equality, if we use congruence to get under the '(- n)' beginning part, we can re-use our original equality with 'n' parameter being supplied. This results in the equality (- n) + m * (- n) = (- n) + (- (m * n)). Afterwards, using transitivity, to change the right-hand side, we will also note, since we proved inv-hom, that we can rewrite '(- n) + (- (m * n))' as '- (n + m * n)', if we use the symmetric version of our previously proven inv-hom property and supply 'n' to the m parameter, and 'm * n' to the n parameter. This will result in the equation (- n) + m * (- n) = (- (n + m * n)). We will note, once again, that definitionally succ m * n = n + m * n, so the right-hand side is also what we need to prove.
+
+  For the pred case: (pred m) * (- n) = - ((pred m) * n). Similarly to the 'succ' case, we note that definitionally pred m * (- n) = (- (- n)) + m * (- n) and pred m * n = (- n) + m * n hold true. In a similar chain of thought, we can use congruence to get under the '(- (- n))' part, we can re-use our original equality with 'n' parameter supplied to it. Afterwards we can use transitivity, and the previously proven inv-hom, specifically the symmetric version of it, with '- n' supplied to the m parameter, and 'm * n' supplied to the n parameter to rewrite our right-hand side. This results in the equation (- (- n)) + m * (- n) = (- ((- n) + m * n)), where both left- and right-hand sides are definitionally equal to the equation we need to prove.
+\end{proof}
+
+\begin{minted}{agda}
 *-inv : ∀ m n → m * (- n) ≡ - (m * n)
 *-inv = ℤₕ-ind-prop
   (λ _ → isPropΠ λ _ → isSetℤₕ _ _)
   (λ n → refl)
   (λ m p n → cong (- n +_) (p n) ∙ sym (inv-hom-ℤₕ n (m * n)))
   (λ m p n → cong (- (- n) +_) (p n) ∙ sym (inv-hom-ℤₕ (- n) (m * n)))
+\end{minted}
 
+\begin{theorem}
+  Similarly, multiplying a left negated number ('- m') by a number ('n') is the same as multiplying the non-negated numbers first ('m * n'), and negating the result: ∀ m, n ∈ ℤ: (- m) * n = - (m * n).
+\end{theorem}
+
+\begin{proof}
+  Using the commutative property of multiplication, we can rewrite the left-hand side of our equation: (- m) * n = n * (- m). Using transitivity, we can continue changing the right-hand side of the equation. Our previously proved multiplication-negation relation has the same left-hand side that we need to change, applying it (with the 'm' parameter being 'n' and the 'n' parameter being 'm') we get the following equation: (- m) * n = - (n * m). Once again, we need to use transtivity to keep changing the right-hand side of the equation. If we use the commutative property of multiplication under the negation operation, we can rewrite the right-hand side of the equation to match the equation we need to prove.
+\end{proof}
+
+\begin{minted}{agda}
 inv-* : ∀ m n → (- m) * n ≡ - (m * n)
 inv-* m n = *-comm (- m) n ∙ *-inv n m ∙ cong (-_) (*-comm n m)
+\end{minted}
 
+\begin{theorem}
+  Multiplication is associative: ∀ m, n, o ∈ ℤ: m * (n * o) = (m * n) * o
+\end{theorem}
+
+\begin{proof}
+  Using our induction property:
+
+  For the base case (m = 0): 0 * (n * o) = (0 * n) * o is a reflection.
+
+  For the succ case: (succ m) * (n * o) = ((succ m) * n) * o. Definitionally, we know that (succ m) * n = n + m * n, With this, we can rewrite our equation to: (n * o) + m * (n * o) = (n + m * n) * o. Note, that on the left-hand side, apart from the '(n * o)' part, we have our original equality's left-hand side. If we use congruence to get under this '(n * o)' part, we can apply the original equality (with 'n' and 'o' parameters supplied respectively). This changes our equation to: (n * o) + m * (n * o) = (n * o) + (m * n) * o, using transitivity, we can change the right-hand side. We note that that if we use the symmetric version of multiplication distributing over addition on the left hand side, with 'n', 'm * n' and 'o' supplied, we have the property of: (n * o) + ((m * n) * o) = (n + (m * n)) * o. The order of parentheses are correct, so this case is proven.
+
+  For the pred case: (pred m) * (n * o) = ((pred m) * n) * o. Once again, we know definitionally that (pred m) * n = (- n) + m * n. Using this, we can rewrite the equation to: - (n * o) + m * (n * o) = ((- n) + m * n) * o. Once again, on the left-hand side, apart from the '- (n * o)' part, we have our original equality's left-hand side. We can use congruence once again to get under this part, and apply the original equality (with the same 'n' and 'o' parameters). Using this, our equation becomes: - (n * o) + m * (n * o) = - (n * o) + (m * n) * o. We will need to use transtivity once again to change the right-hand side of the equation. Unlike last time, we cannot use the left distributive property of multiplication over addition yet, since we cannot match the parameters correctly just yet. If we first instead use our previously proven 'inv-*' property (before first getting under the '+ m * n * o' part - note that since multiplication is parenthesized from the left, (m * n) * o and m * n * o are equal), specifically the symmetric version of it (with 'n' and 'o' parameters supplied), we can change our equation to: - (n * o) + m * (n * o) = (- n) * o + (m * n) * o. Using another transitivity, we can now use the left distributive property of multiplication over addition (again, the symmetric version of it), with '(- n)', 'm * n' and 'o' parameters supplied. With this, our equation becomes: - (n * o) + m * (n * o) = ((- n) + (m * n)) * o. Once again, thanks to the order of parentheses is correct, this case is also proven.
+\end{proof}
+
+\begin{listing}[H]
+\begin{minted}{agda}
 *-assoc : ∀ m n o → m * (n * o) ≡ (m * n) * o
 *-assoc = ℤₕ-ind-prop
   (λ _ → isPropΠ2 λ _ _ → isSetℤₕ _ _)
   (λ n o → refl)
-  (λ m p n o → cong (n * o +_) (p n o) ∙ *-distribʳ-+ n (m * n) o)
-  (λ m p n o → cong (- (n * o) +_) (p n o) ∙ cong (_+ m * n * o) (sym (inv-* n o)) ∙ *-distribʳ-+ (- n) (m * n) o)
+  (λ m p n o → cong (n * o +_) (p n o) ∙ sym (*-distribˡ-+ n (m * n) o))
+  (λ m p n o → cong (- (n * o) +_) (p n o) ∙ cong (_+ m * n * o) (sym (inv-* n o)) ∙ sym (*-distribˡ-+ (- n) (m * n) o))
 \end{minted}
+\caption{Agda proof of multiplication being associative}
+\end{listing}
