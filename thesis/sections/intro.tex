@@ -38,7 +38,6 @@ Since we need to use a proof assistant that supports HITs, which CTT supports,\c
 The main benefit of our HIT integers will be that we can eliminate to higher dimensions (more specifically, above set, for example, to groupoid). The same could be said about Bi-Invertible integers, which use 2 'pred' constructors instead, and ditch the 'coherent' rule, however, a single 'pred' constructor with a 'coherent' rule is more elegant. There is also a definition of integers with the added 'isSet' constructor, while you could also eliminate with this version, you couldn't eliminate above set. Moreover, when defining your indunction property, you would also have to define the case for the 'isSet' constructor.
 
 \section{Commutative Ring}
-
 Our question is the following: Is this definition of integers a correct one, is it a set with decidable equality, and if so, do they form a commutative ring? (While this should be fairly obvious, integers do form a commutative ring, with the higher inductive type definition of integers, this hasn't been formally proven yet.) Moreover, what does it mean for integers to form a commutative ring? We will have to prove the following:
 
 \begin{compactitem}
@@ -54,7 +53,7 @@ Our question is the following: Is this definition of integers a correct one, is 
   \item The set is monoid under multiplication:
     \begin{compactitem}
     \item Multiplication is associative
-    \item The indetity element exists
+    \item The identity element exists
     \end{compactitem}
   \item Multiplication distributes over addition
   \end{compactitem}
