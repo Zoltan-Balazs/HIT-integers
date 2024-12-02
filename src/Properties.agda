@@ -188,30 +188,30 @@ m - n = m + (- n)
   (λ _ → isSetℤₕ _ _)
   refl
   (λ z p → cong pred (+-succ (- z) z)
-                      ∙
-                      sec _
-                      ∙
-                      p)
+           ∙
+           sec _
+           ∙
+           p)
   (λ z p → cong succ (+-pred (- z) z)
-                      ∙
-                      ret _
-                      ∙
-                      p)
+           ∙
+           ret _
+           ∙
+           p)
 
 +-invʳ : ∀ z → z + (- z) ≡ zero
 +-invʳ = ℤₕ-ind-prop
   (λ _ → isSetℤₕ _ _)
   refl
   (λ z p → cong succ (+-pred z (- z))
-                      ∙
-                      ret _
-                      ∙
-                      p)
+           ∙
+           ret _
+           ∙
+           p)
   (λ z p → cong pred (+-succ z (- z))
-                      ∙
-                      sec _
-                      ∙
-                      p)
+           ∙
+           sec _
+           ∙
+           p)
 
 inv-hom-ℤₕ : ∀ m n → - (m + n) ≡ (- m) + (- n)
 inv-hom-ℤₕ = ℤₕ-ind-prop
