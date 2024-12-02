@@ -248,7 +248,7 @@ m * n = ℤₕ-ite zero (Equiv-n+-ℤₕ n) m
 
 *-zero : ∀ z → z * zero ≡ zero
 *-zero = ℤₕ-ind-prop
-  (λ - → isSetℤₕ _ _)
+  (λ _ → isSetℤₕ _ _)
   refl
   (λ z p → p)
   (λ z p → p)
