@@ -74,3 +74,30 @@ With the induction principle, defining the induction property is easy. The induc
 \caption{Agda code for the induction property}
 \end{listing}
 (Note: We use the fact that Agda can infer the needed arguments for 'P-isProp', we can also manually give these parameters, but this would only lengthen our definition. See the source file for the manually given parameters.)
+
+\section{Iterator}
+While the induction property is useful for allowing us to use induction when proving properties, the iterator property will make it easier for us to define operations on our type. While it would be possible to manually pattern match, we would have a hard time to give the needed boundaries in the 1- and 2-dimensional cases, especially in the case of multiplication.
+
+\begin{listing}[H]
+\begin{minted}{agda}
+ℤₕ-ite :
+  ∀ {ℓ} {A : Type ℓ}
+  → A
+  → A ≃ A
+  → ℤₕ
+  → A
+ℤₕ-ite {A = A} a e =
+  let
+    (s , isHA) = equiv→HAEquiv e
+  in
+    ℤₕ-ind
+      {P = λ _ → A}
+      a
+      (λ _ → s)
+      (λ _ → g isHA)
+      (λ _ → linv isHA)
+      (λ _ → rinv isHA)
+      (λ _ → com isHA)
+\end{minted}
+\caption{Agda code for the iterator}
+\end{listing}
