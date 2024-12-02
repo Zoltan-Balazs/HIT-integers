@@ -107,8 +107,7 @@ succIso .Iso.leftInv  = sec
 succEquiv : ℤₕ ≃ ℤₕ
 succEquiv = isoToEquiv succIso
 
-infixl 6 _+_ _-_
-infixl 7 _*_
+infixl 6 _+_
 
 _+_ : ℤₕ → ℤₕ → ℤₕ
 _+_ = ℤₕ-ite (idfun ℤₕ) (postCompEquiv succEquiv)
@@ -177,14 +176,11 @@ _+_ = ℤₕ-ite (idfun ℤₕ) (postCompEquiv succEquiv)
 -_ = ℤₕ-ite zero (invEquiv succEquiv)
 -- - n = ℤₕ-ite zero (invEquiv succEquiv) n
 
+-- Subtraction
+infixl 7 _-_
+
 _-_ : ℤₕ → ℤₕ → ℤₕ
 m - n = m + (- n)
-
-+-idˡ : ∀ z → zero + z ≡ z
-+-idˡ z = refl
-
-+-idʳ : ∀ z → z + zero ≡ z
-+-idʳ = +-zero
 
 +-invˡ : ∀ z → (- z) + z ≡ zero
 +-invˡ = ℤₕ-ind-prop
@@ -245,6 +241,8 @@ isEquiv-n+-ℤₕ z = isoToIsEquiv (Iso-n+-ℤₕ z)
 
 Equiv-n+-ℤₕ : (z : ℤₕ) → ℤₕ ≃ ℤₕ
 Equiv-n+-ℤₕ z = z +_ , isEquiv-n+-ℤₕ z
+
+infixl 7 _*_
 
 _*_ : ℤₕ → ℤₕ → ℤₕ
 m * n = ℤₕ-ite zero (Equiv-n+-ℤₕ n) m
@@ -373,7 +371,8 @@ inv-* m n =
     ∙
     sym (*-distribˡ-+ (- n) (m * n) o))
 
-AbGroupℤₕ+ : IsAbGroup {lzero} {ℤₕ} zero _+_ (-_)
+-- Is addition abelian group definition
+AbGroupℤₕ+ : IsAbGroup {A = ℤₕ} zero _+_ (-_)
 AbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.isMonoid .IsMonoid.isSemigroup .IsSemigroup.is-set = isSetℤₕ
 AbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.isMonoid .IsMonoid.isSemigroup .IsSemigroup.·Assoc = +-assoc
 AbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.isMonoid .IsMonoid.·IdR = +-idʳ
@@ -382,18 +381,21 @@ AbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.·InvR = +-invʳ
 AbGroupℤₕ+ .IsAbGroup.isGroup .IsGroup.·InvL = +-invˡ
 AbGroupℤₕ+ .IsAbGroup.+Comm = +-comm
 
-Monoidℤₕ* : IsMonoid {lzero} {ℤₕ} (succ zero) _*_
+-- Is multiplication monoid definition
+Monoidℤₕ* : IsMonoid {A = ℤₕ} (succ zero) _*_
 Monoidℤₕ* .IsMonoid.isSemigroup .IsSemigroup.is-set = isSetℤₕ
 Monoidℤₕ* .IsMonoid.isSemigroup .IsSemigroup.·Assoc = *-assoc
 Monoidℤₕ* .IsMonoid.·IdR = *-idʳ
 Monoidℤₕ* .IsMonoid.·IdL = *-idˡ
 
-Ringℤₕ*+ : IsRing {lzero} {ℤₕ} zero (succ zero) _+_ _*_ (-_)
+-- Is multiplication and addition ring definition
+Ringℤₕ*+ : IsRing {R = ℤₕ} zero (succ zero) _+_ _*_ (-_)
 Ringℤₕ*+ .IsRing.+IsAbGroup = AbGroupℤₕ+
 Ringℤₕ*+ .IsRing.·IsMonoid = Monoidℤₕ*
 Ringℤₕ*+ .IsRing.·DistR+ = *-distribʳ-+
 Ringℤₕ*+ .IsRing.·DistL+ = *-distribˡ-+
 
-CommRingℤₕ*+ : IsCommRing {lzero} {ℤₕ} zero (succ zero) _+_ _*_ (-_)
+-- Is multiplication and addition commutative ring definition
+CommRingℤₕ*+ : IsCommRing {R = ℤₕ} zero (succ zero) _+_ _*_ (-_)
 CommRingℤₕ*+ .IsCommRing.isRing = Ringℤₕ*+
 CommRingℤₕ*+ .IsCommRing.·Comm = *-comm
