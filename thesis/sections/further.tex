@@ -100,8 +100,12 @@ pred-inj m n eq = sym (ret m) ∙ congS succ eq ∙ ret n
 \end{minted}
 
 \section{Division (and Modulus)}
-!!NEEDED!!
-\begin{minted}[fontsize=\small]{agda}
+It is possible to write a division operator for integers. One might ask how that is possible, since, for example, 3 / 2 results in something that is not an integer. The answer lies in rounding down (or up) the result. Unfortunately, due to this, we cannot use our iterator to define this operator, as it is non-reversible, we need to pattern match.
+This brings its own problems, as for our 1- and 2-dimensional constructors ('sec', 'ret' and 'coh') it turns out to be a laborous task.
+There is also the problem of dividing by zero, for which the standard Agda library introduces an interesting solution. Introducing a 'NonZero' record, which can ensure that the divisor is not zero.
+For the operation itself, we introduce a helper function, which will handle the cases. A simple 'succ' case division is introduced. (As it is seen in the Agda standard library\cite{div-nat})
+These same principles also apply for the modulus operator:
+\begin{minted}{agda}
 record NonZero (z : ℤₕ) : Set where
   field
     nonZero : Bool→Type (not (z ≡ zero))
