@@ -2,18 +2,67 @@
 \label{ch:monoid}
 
 \section{Multiplication Operation}
-\begin{minted}[fontsize=\small]{agda}
+To define the multiplication operation, we will once again use our iterator. In this case however, we will have to do a bit of extra work. We cannot provide an Isomorphism in such an easy way as we did with addition. From elementary grade mathmatics, we know that multiplication is just repeated addition, for example if we want to calculate '3 * 4', we would do '4 + 4 + 4', or adding together '4' (right element) '3' (left element) times. So our main idea is to start with zero, and repeat the addition of the right parameter exactly the number of left parameter times (if the left parameter is negative, we will just add the inverted right parameter the absolute value of left parameter times).
+
+As before, our function of having this desired effect will be defining the 'function' of isomorphism as 'z +', conversely, we can define the 'inverse function' as adding the negated value of this 'z': '- z +' since this will invert the effect of adding z to a number.
+
+Next, we will need to prove the 'retraction' property of this.
+\begin{theorem}
+  Adding a negated value to a number, then the non-negated value of the same value, we get back the original number: ∀ m, n ∈ ℤ: n + ((- n) + m) = m
+\end{theorem}
+
+\begin{proof}
+  To prove this, we will first use the associative property of addition to match the left-hand side. Supplying 'n', '- n' and 'm' results in the following equation: n + ((- n) + m) ≡ n + (- n) + m. We use transitivity to change the right-hand side of the equation. Getting under the '+ m' part, we can apply the existence of the right inverse element of addition with 'n' parameter. This will replace 'n + (- n)' with 0: n + ((- n) + m) ≡ 0 + m. We know that definitionally 0 + m = m, this property is proven.
+\end{proof}
+
+Afterwards, we will have to prove the 'section' property of this.
+\begin{theorem}
+  Adding a non-negated value to a number, then the negated value of the same value, we get back the original number: ∀ m, n ∈ ℤ: (- n) + (n + m) = m
+\end{theorem}
+
+\begin{proof}
+  Similarly to the previous proof, to prove this, we will first use the associative property of addition to match the left-hand side. Supplying '- n', 'n' and 'm' results in the following equation: (- n) + (n + m) ≡ (- n) + n + m. We use transitivity to change the right-hand side of the equation. Getting under the '+ m' part, we can apply the existence of the left inverse element of addition with 'n' parameter. This will replace '(- n) + n' with 0: (- n) + (n + m) ≡ 0 + m. We know that definitionally 0 + m = m, this property is also proven.
+\end{proof}
+
+Next, we can convert this isomorphism to the proof that 'z +' is an equivalence ('isEquiv'), since we will need to supply parameters this time (instead of placing the constructors), we cannot directly convert to the equivalence ('Equiv'). Afterwards we will define our ordered pair of the equivalence, with a parameter this time.
+
+Lastly, when defining our operation, we will use our previously mentioned idea of placing 'n +' (or '- n +') 'm' times on zero.
+
+\begin{minted}{agda}
 Iso-n+-ℤₕ : (z : ℤₕ) → Iso ℤₕ ℤₕ
-Iso.fun (Iso-n+-ℤₕ z) = z +_
-Iso.inv (Iso-n+-ℤₕ z) = - z +_
+Iso.fun      (Iso-n+-ℤₕ z)   = z +_
+Iso.inv      (Iso-n+-ℤₕ z)   = - z +_
 Iso.rightInv (Iso-n+-ℤₕ n) m = +-assoc n (- n) m ∙ cong (_+ m) (+-invʳ n)
-Iso.leftInv (Iso-n+-ℤₕ n) m = +-assoc (- n) n m ∙ cong (_+ m) (+-invˡ n)
+Iso.leftInv  (Iso-n+-ℤₕ n) m = +-assoc (- n) n m ∙ cong (_+ m) (+-invˡ n)
 
 isEquiv-n+-ℤₕ : ∀ z → isEquiv (z +_)
 isEquiv-n+-ℤₕ z = isoToIsEquiv (Iso-n+-ℤₕ z)
 
+Equiv-n+-ℤₕ : (z : ℤₕ) → ℤₕ ≃ ℤₕ
+Equiv-n+-ℤₕ z = z +_ , isEquiv-n+-ℤₕ z
+
 _*_ : ℤₕ → ℤₕ → ℤₕ
-m * n = ℤₕ-ite zero (n +_ , isEquiv-n+-ℤₕ n) m
+m * n = ℤₕ-ite zero (Equiv-n+-ℤₕ n) m
+\end{minted}
+
+Definitionally, the following hold true for the multiplication operation in Agda:
+\begin{minted}{agda}
+zero   * n ≡ zero
+succ m * n ≡ n + m * n
+pred m * n ≡ (- n) + m * n
+\end{minted}
+Note that the symmetric version of these also holds true.
+
+We could once again try to define multiplication by pattern matching. In this case however, even defining 'sec' is tricky.
+% !!BOUNDARY!!
+\begin{minted}{agda}
+_*_ : ℤₕ → ℤₕ → ℤₕ
+zero      * b = zero
+succ a    * b = a * b + b
+pred a    * b = a * b - b
+sec a i   * b = ?
+ret a i   * b = ?
+coh a i j * b = ?
 \end{minted}
 
 \section{Multiplication Distributes over Addition}
