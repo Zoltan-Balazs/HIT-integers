@@ -18,16 +18,59 @@ This is a sort of pseudo comparison of the standard integer type and our type as
 Note: We could also go the way of defining that our HIT integers are discrete. One of the main points of the thesis is to compare different integer definitions to the HIT integers, so we will try to do less work and prove that our HIT integers form a set while comparing them to the standard integer definition. This also brings the quite fortunate side-effect that any other integer definitions that also prove isomorphism with the standard integers (in the cubical library one notable example is the previously mentioned bi-invertible integers) also, by extension, are isomorphic with our HIT integers.
 
 Let us begin with proving the equivalence between standard integers and HIT integers.
+
+\section{Converting our type to the standard definition}
+First off, we will define the function to convert from our type to the standard integer type. We will do so by pattern matching on our integer value. This will give us all the cases for our constructors, for which we will need to provide an equivalent standard integer value. For our 'zero' value, the equivalent standard integer value is 'pos zero'. For our 'succ z' case, we will need to increment the value with 'sucℤ' and recursively convert the rest by calling our conversion function with 'z'. 'sucℤ' is defined for the standard integers, its purpose is to increment the standard integer value by one. For our 'pred z' case we will do the same thing, just with 'predℤ', as one might imagine, 'predℤ' is responsible for decrementing the standard integer value by one. The next case is the first truly interesting one, as we will have to convert a 'sec' integer to a standard integer value. As previously mentioned 'sec' is responsible for the equivalence of \mintinline{agda}{pred (succ z) ≡ z}. As such, we will not only need to give an appropriate standard integer value, but also satisfy the boundaries as stated by Agda:
+\begin{minted}{agda}
+i = i0 ⊢ predℤ (sucℤ (ℤₕ-ℤ z))
+i = i1 ⊢ ℤₕ-ℤ z
+\end{minted}
+These boundaries match what our 'sec' constructor state, just for the standard integer values. (Note that instead of our integer type, we are dealing with the converted standard integer values, as such, we are basically proving that \mintinline{agda}{predℤ (sucℤ (ℤₕ-ℤ z)) ≡ ℤₕ-ℤ z}). Thankfully for us, there is a function in the standard library for this exact case called 'predSuc', this provides the exact boundary we need: \mintinline{agda}{∀ z → predℤ (sucℤ z) ≡ z}, as before, we will need to recursively call with the converted remaining integer value, as well as to pass the boundary 'i', as without that, it is just an equivalence, but giving the 'i' boundary resolves it to a standard integer value.
+This is also the case for our 'ret' constructor, we will just need to use the standard 'sucPred' function, which is exactly what we need to satisfy the boundaries. (The wanted boundary is also different, to reflect the fact that we need to prove that 'ret' is defined as \mintinline{agda}{succ (pred z) ≡ z}.)
+Our last constructor is 'coh', for which we will need a standard integer value and satisfy the needed boundaries. We will define the 'coh' rule for the standard integers. Following the cubical library, we will pattern match, do cover the 'pos n', 'negsuc zero' and 'negsuc (suc n)' cases. All of these cases result in a reflection, thanks to the way that 'sucℤ', 'predSuc' and 'sucPred' are defined.
+\begin{minted}{agda}
+cohℤ : ∀ z → congS sucℤ (predSuc z) ≡ sucPred (sucℤ z)
+cohℤ (pos n)          = refl
+cohℤ (negsuc zero)    = refl
+cohℤ (negsuc (suc n)) = refl
 \end{minted}
 
-\subsection{Converting the standard definition to our type}
-!!NEEDED!!
-\begin{minted}[fontsize=\small]{agda}
-ℤ-ℤₕ : ℤ → ℤₕ
-ℤ-ℤₕ (pos zero)       = zero
-ℤ-ℤₕ (pos (suc n))    = succ (ℤ-ℤₕ (pos n))
-ℤ-ℤₕ (negsuc zero)    = pred zero
-ℤ-ℤₕ (negsuc (suc n)) = pred (ℤ-ℤₕ (negsuc n))
+Note: the wanted boundaries for the conversion's 'coh' branch are as such:
+\begin{minted}{agda}
+j = i0 ⊢ sucℤ (predℤ (sucℤ (ℤₕ→ℤ z)))
+j = i1 ⊢ sucℤ (ℤₕ→ℤ z)
+i = i0 ⊢ sucℤ (predSuc (ℤₕ→ℤ z) j)
+i = i1 ⊢ sucPred (sucℤ (ℤₕ→ℤ z)) j
+\end{minted}
+these exactly correspond to what the 4 parts of our 'coh' rule are, just with the standard integer functions and values. When using the 'coh' rule defined for the standard integers, we will have to convert our HIT integer to a standard integer, as well as providez both of our original boundaries.
+
+Rewriting these wanted boundaries in Agda to a Square results in the following:
+\[
+\begin{tikzcd}
+	\bullet &&&& \bullet \\
+	\\
+	\\
+	\\
+	\bullet &&&& \bullet
+	\arrow["{suc\mathbb{Z}\:(\mathbb{Z}_h\shorttextrightarrow\mathbb{Z}\:z)}"{description}, no head, from=1-1, to=1-5]
+	\arrow["{suc\mathbb{Z}\:(predSuc\:(\mathbb{Z}_h\shorttextrightarrow\mathbb{Z}\:z)\:j)}"{description}, no head, from=5-1, to=1-1]
+	\arrow["{suc\mathbb{Z}\:(pred\mathbb{Z}\:(suc\mathbb{Z}\:(\mathbb{Z}_h\shorttextrightarrow\mathbb{Z}\:z)))}"{description}, no head, from=5-1, to=5-5]
+	\arrow["{sucPred\:(suc\mathbb{Z}\:(\mathbb{Z}_h\shorttextrightarrow\mathbb{Z}\:z))\:j}"{description}, no head, from=5-5, to=1-5]
+\end{tikzcd}
+\]
+
+\begin{listing}[H]
+\begin{minted}{agda}
+ℤₕ→ℤ : ℤₕ → ℤ
+ℤₕ→ℤ zero        = pos zero
+ℤₕ→ℤ (succ z)    = sucℤ (ℤₕ→ℤ z)
+ℤₕ→ℤ (pred z)    = predℤ (ℤₕ→ℤ z)
+ℤₕ→ℤ (sec z i)   = predSuc (ℤₕ→ℤ z) i
+ℤₕ→ℤ (ret z i)   = sucPred (ℤₕ→ℤ z) i
+ℤₕ→ℤ (coh z i j) = cohℤ (ℤₕ→ℤ z) i j
+\end{minted}
+\caption{Agda code for converting between HIT and the standard integers}
+\end{listing}
 \end{minted}
 
 \subsection{Converting the standard definition to our type and back}
