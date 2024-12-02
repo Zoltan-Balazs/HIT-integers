@@ -28,7 +28,7 @@ cohℤ (negsuc zero)    = refl
 cohℤ (negsuc (suc n)) = refl
 
 -- Higher inductive type definition of ℤ
-data ℤₕ : Set where
+data ℤₕ : Set₀ where
     zero : ℤₕ
     succ : ℤₕ → ℤₕ
     pred : ℤₕ → ℤₕ
