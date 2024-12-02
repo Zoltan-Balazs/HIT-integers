@@ -2,7 +2,18 @@
 \label{ch:abgroup}
 
 \section{Addition Operation}
-\begin{minted}[fontsize=\small]{agda}
+To define addition, we will use our iterator. For this, we will need an equivalence, in this simpler case we will first define an isomorphism, then convert that to an equivalence.
+This isomorphism will be based on 'succ' being the function, its inverse function will be 'pred', and to prove that using 'succ' then 'pred', and using 'pred' then 'succ' results in the same value, we will use our 'section' and 'retraction' constructors.
+
+We can then convert this isomorphism to an equivalence with the 'isoToEquiv' builtin function. Equivalence is an ordered pair, where the first parameter will be our 'succ' function, and the second will contain the proofs we previously mentioned.
+
+Using the iterator we defined earlier, we can first supply the 'idfun' (identity function) version of ℤₕ, this will convert ℤₕ to a 'ℤₕ → ℤₕ' type. This will be beneficial since we have 2 implicit parameters, and we will want to move the constructors ('succ' and 'pred') from the left parameter to the right one. Next, we will post-compose our defined 'succEquiv'. This will change our 'ℤₕ ≃ ℤₕ' to a '(ℤₕ → ℤₕ) ≃ (ℤₕ → ℤₕ)' (more specifically (C → ℤₕ) ≃ (C → ℤₕ)), this is to match the type needed by our iterator. We implicitly supply the left and right parameters to this. (More specifically, we will first supply our left parameter, for this our iterator will return ℤₕ → ℤₕ, and we will supply our right parameter to this - see the comment in the code for this).
+
+This will have the desired effect that we wanted: from our left parameter the 'succ' and 'pred' constructors will be placed on the beginning of the right parameter, which is otherwise known as addition.
+
+As we already established when defining our iterator, we won't have to deal with our 1- and 2-dimensional construcotrs and their boundaries, as it is handled by our iterator.
+
+\begin{minted}{agda}
 succIso : Iso ℤₕ ℤₕ
 succIso .Iso.fun      = succ
 succIso .Iso.inv      = pred
@@ -15,6 +26,27 @@ succEquiv = isoToEquiv succIso
 infixl 6 _+_
 _+_ : ℤₕ → ℤₕ → ℤₕ
 _+_ = ℤₕ-ite (idfun ℤₕ) (postCompEquiv succEquiv)
+-- m + n = (ℤₕ-ite (idfun ℤₕ) (postCompEquiv succEquiv) m) n
+\end{minted}
+
+Definitionally, the following hold true for the addition operation in Agda:
+\begin{minted}{agda}
+zero   + n ≡ n
+succ m + n ≡ succ (m + n)
+pred m + n ≡ pred (m + n)
+\end{minted}
+Note that the symmetric version of these also hold true.
+
+Alternatively, we could define addition by pattern matching on the second parameter, this would mean we manually have to satisfy the boundaries in the 1- and 2-dimensional constructor cases, however, here they would be fairly trivial:
+% !!BOUNDARY!!
+\begin{minted}{agda}
+_+_ : ℤₕ → ℤₕ → ℤₕ
+zero      + b = b
+succ a    + b = succ (a + b)
+pred a    + b = pred (a + b)
+sec a i   + b = sec (a + b) i
+ret a i   + b = ret (a + b) i
+coh a i j + b = coh (a + b) i j
 \end{minted}
 
 \section{Associativity}
