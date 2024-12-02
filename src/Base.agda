@@ -53,16 +53,12 @@ hoc = com-op isHAℤₕ
 ℤ→ℤₕ (negsuc zero)    = pred zero
 ℤ→ℤₕ (negsuc (suc n)) = pred (ℤ→ℤₕ (negsuc n))
 
-ℤ-ℤₕ-predSuc : (x : ℤ)
-              → Square (ℤ-ℤₕ-predℤ (sucℤ x) ∙ (λ i → pred (ℤ-ℤₕ-sucℤ x i)))
-                       (λ _ → ℤ-ℤₕ x)
-                       (λ i → ℤ-ℤₕ (predSuc x i))
-                       (sec (ℤ-ℤₕ x))
-ℤ-ℤₕ-predSuc (pos n) i j
-  = hcomp (λ k → λ { (j = i0) → ℤ-ℤₕ (pos n)
-                   ; (i = i0) → rUnit (sym (sec (ℤ-ℤₕ (pos n)))) k j
-                   ; (i = i1) → ℤ-ℤₕ (pos n)
-                   ; (j = i1) → sec (ℤ-ℤₕ (pos n)) i
+-- Proof that converting Standard Integers to HIT Integers and back is equal to the initial value
+ℤ→ℤₕ→ℤ : (z : ℤ) → ℤₕ→ℤ (ℤ→ℤₕ z) ≡ z
+ℤ→ℤₕ→ℤ (pos zero)       = refl
+ℤ→ℤₕ→ℤ (pos (suc n))    = cong sucℤ (ℤ→ℤₕ→ℤ (pos n))
+ℤ→ℤₕ→ℤ (negsuc zero)    = refl
+ℤ→ℤₕ→ℤ (negsuc (suc n)) = cong predℤ (ℤ→ℤₕ→ℤ (negsuc n))
                    })
           (sym-filler (sec (ℤ-ℤₕ (pos n))) i j)
 ℤ-ℤₕ-predSuc (negsuc zero) i j
