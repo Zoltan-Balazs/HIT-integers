@@ -106,98 +106,136 @@ For 'negsuc (suc n)' the story is quite similar. We need to prove the following:
 \end{minted}
 \caption{Agda proof that converting standard integers to HIT integers and back results in the same value}
 \end{listing}
+
+\section{Converting our type to the standard definition and back}
+Conversely, we will have to prove the other back-and-forth as well. We will need to pattern match to prove cases for all of our HIT integer constructors.
+
+For the 'zero' case, thankfully this is going to be a reflection. (Once again due to the way we defined 'ℤ→ℤₕ' and 'ℤₕ→ℤ'.)
+
+For our 'succ' case, we will need to prove ℤ→ℤₕ (sucℤ (ℤₕ→ℤ z)) ≡ succ z. We will need to define the equivalence of first incerementing a standard integer with 'sucℤ' and converting it to HIT integer and first converting a standard integer to HIT integer and incrementing it with 'succ'. This is also going to be a fairly trivial proof, we will just need to use our 'retraction' constructor on the 'negsuc' cases (more specifically the symmetric version of it) with the standard integer value +1 converted:
+\begin{minted}{agda}
 ℤ-ℤₕ-sucℤ : (z : ℤ) → ℤ-ℤₕ (sucℤ z) ≡ succ (ℤ-ℤₕ z)
 ℤ-ℤₕ-sucℤ (pos n)          = refl
 ℤ-ℤₕ-sucℤ (negsuc zero)    = sym (ret (ℤ-ℤₕ (pos zero)))
 ℤ-ℤₕ-sucℤ (negsuc (suc n)) = sym (ret (ℤ-ℤₕ (negsuc n)))
+\end{minted}
+Once we have this, we can using it, we get the following: ℤ→ℤₕ (sucℤ (ℤₕ→ℤ z)) ≡ succ (ℤ→ℤₕ (ℤₕ→ℤ z)), we can use a transitivity to rewrite the right-hand side with a lambda function (to introduce the boundary), since ℤ→ℤₕ (ℤₕ→ℤ z) is exactly what we are trying to prove is equal to z.
 
+For our 'pred' case, we similarly have to prove that ℤ→ℤₕ (predℤ (ℤₕ→ℤ z)) ≡ pred z. We will once again introduce the same equivalence for decrementing with 'predℤ' and converting being the same as converting then decrementing with 'pred'. This is an even more trivial proof, we will to use the 'section' constructor on the 'pos (suc n)' case (again, the symmetric version of it) with the standard integer value -1 converted.
+\begin{minted}{agda}
 ℤ-ℤₕ-predℤ : (z : ℤ) → ℤ-ℤₕ (predℤ z) ≡ pred (ℤ-ℤₕ z)
 ℤ-ℤₕ-predℤ (pos zero)    = refl
 ℤ-ℤₕ-predℤ (pos (suc n)) = sym (sec (ℤ-ℤₕ (pos n)))
 ℤ-ℤₕ-predℤ (negsuc n)    = refl
+\end{minted}
+This won't be enough, as using this, we get the following: ℤ→ℤₕ (predℤ (ℤₕ→ℤ z)) ≡ pred (ℤ→ℤₕ (ℤₕ→ℤ z)), using transitivity again, we can rewrite the right-hand side, since it should be equal (at least we are trying to prove it) to pred z.
 
+We won't dive that deep into our 'sec' and 'ret' cases right now, do note that we will introduce a helper function to fill a square. The same proof is present in the standard library, when trying to prove that bi-invertible integers form a set. In the further work chapter, we will dive deeper into how the 'coh' case can be solved, the same idea is used when trying to prove 'sec' and 'ret'.
+
+\begin{minted}{agda}
 sym-filler : ∀ {ℓ} {A : Type ℓ} {x y : A} (p : x ≡ y)
                 → Square (sym p)
                          refl
                          refl
                          p
 sym-filler p i j = p (i ∨ ~ j)
+\end{minted}
 
-ℤ-ℤₕ-sucPred : (z : ℤ)
-              → Square (ℤ-ℤₕ-sucℤ (predℤ z) ∙ (λ j → succ (ℤ-ℤₕ-predℤ z j)))
-                       (λ _ → ℤ-ℤₕ z)
-                       (λ i → ℤ-ℤₕ (sucPred z i))
-                       (ret (ℤ-ℤₕ z))
-ℤ-ℤₕ-sucPred (pos zero) i j =
-  hcomp (λ k → λ { (j = i0) → ℤ-ℤₕ (pos zero)
-                 ; (i = i0) → rUnit (sym (ret (ℤ-ℤₕ (pos zero)))) k j
-                 ; (i = i1) → ℤ-ℤₕ (pos zero)
-                 ; (j = i1) → ret (ℤ-ℤₕ (pos zero)) i
-                 })
-        (sym-filler (ret (ℤ-ℤₕ (pos zero))) i j)
-ℤ-ℤₕ-sucPred (pos (suc n)) i j =
-  hcomp (λ k → λ { (j = i0) → succ (ℤ-ℤₕ (pos n))
-                 ; (i = i0) → lUnit (λ i → succ (sym (sec (ℤ-ℤₕ (pos n))) i)) k j
-                 ; (i = i1) → succ (ℤ-ℤₕ (pos n))
-                 ; (j = i1) → coh (ℤ-ℤₕ (pos n)) k i
-                 })
-        (succ (sym-filler (sec (ℤ-ℤₕ (pos n))) i j))
-ℤ-ℤₕ-sucPred (negsuc n) i j =
-  hcomp (λ k → λ { (j = i0) → ℤ-ℤₕ (negsuc n)
-                 ; (i = i0) → rUnit (sym (ret (ℤ-ℤₕ (negsuc n)))) k j
-                 ; (i = i1) → ℤ-ℤₕ (negsuc n)
-                 ; (j = i1) → ret (ℤ-ℤₕ (negsuc n)) i
-                 })
-        (sym-filler (ret (ℤ-ℤₕ (negsuc n))) i j)
+The 'sym-filler' helper function is used to fill a square, where 3 points are the same, and we know the equality 'x = y'.
+\[\begin{tikzcd}
+	x && x \\
+	\\
+	y && x
+	\arrow["refl"', no head, from=1-1, to=1-3]
+	\arrow["refl"', no head, from=1-3, to=3-3]
+	\arrow["p"', no head, from=3-1, to=1-1]
+	\arrow["{sym\;p}", no head, from=3-1, to=3-3]
+\end{tikzcd}\]
 
-ℤ-ℤₕ-predSuc : (x : ℤ)
-              → Square (ℤ-ℤₕ-predℤ (sucℤ x) ∙ (λ i → pred (ℤ-ℤₕ-sucℤ x i)))
-                       (λ _ → ℤ-ℤₕ x)
-                       (λ i → ℤ-ℤₕ (predSuc x i))
-                       (sec (ℤ-ℤₕ x))
-ℤ-ℤₕ-predSuc (pos n) i j =
-    hcomp (λ k → λ { (j = i0) → ℤ-ℤₕ (pos n)
-                   ; (i = i0) → rUnit (sym (sec (ℤ-ℤₕ (pos n)))) k j
-                   ; (i = i1) → ℤ-ℤₕ (pos n)
-                   ; (j = i1) → sec (ℤ-ℤₕ (pos n)) i
+To prove the 'sec' case, the following helper function is introduced:
+\begin{minted}{agda}
+ℤ→ℤₕ-predSuc : (x : ℤ)
+              → Square (ℤ→ℤₕ-predℤ (sucℤ x) ∙ (λ i → pred (ℤ→ℤₕ-sucℤ x i)))
+                       (λ _ → ℤ→ℤₕ x)
+                       (λ i → ℤ→ℤₕ (predSuc x i))
+                       (sec (ℤ→ℤₕ x))
+ℤ→ℤₕ-predSuc (pos n) i j
+  = hcomp (λ k → λ { (j = i0) → ℤ→ℤₕ (pos n)
+                   ; (i = i0) → rUnit (sym (sec (ℤ→ℤₕ (pos n)))) k j
+                   ; (i = i1) → ℤ→ℤₕ (pos n)
+                   ; (j = i1) → sec (ℤ→ℤₕ (pos n)) i
                    })
-          (sym-filler (sec (ℤ-ℤₕ (pos n))) i j)
-ℤ-ℤₕ-predSuc (negsuc zero) i j =
-    hcomp (λ k → λ { (j = i0) → ℤ-ℤₕ (negsuc zero)
-                   ; (i = i0) → lUnit (λ i → pred (sym (ret (ℤ-ℤₕ (pos zero))) i)) k j
-                   ; (i = i1) → ℤ-ℤₕ (negsuc zero)
-                   ; (j = i1) → hoc (ℤ-ℤₕ (pos zero)) k i
+          (sym-filler (sec (ℤ→ℤₕ (pos n))) i j)
+ℤ→ℤₕ-predSuc (negsuc zero) i j
+  = hcomp (λ k → λ { (j = i0) → ℤ→ℤₕ (negsuc zero)
+                   ; (i = i0) → lUnit (λ i → pred (sym (ret (ℤ→ℤₕ (pos zero))) i)) k j
+                   ; (i = i1) → ℤ→ℤₕ (negsuc zero)
+                   ; (j = i1) → hoc (ℤ→ℤₕ (pos zero)) k i
                    })
-          (pred (sym-filler (ret (ℤ-ℤₕ (pos zero))) i j))
-ℤ-ℤₕ-predSuc (negsuc (suc n)) i j =
-    hcomp (λ k → λ { (j = i0) → ℤ-ℤₕ (negsuc (suc n))
-                   ; (i = i0) → lUnit (λ i → pred (sym (ret (ℤ-ℤₕ (negsuc n))) i)) k j
-                   ; (i = i1) → ℤ-ℤₕ (negsuc (suc n))
-                   ; (j = i1) → hoc (ℤ-ℤₕ (negsuc n)) k i
+          (pred (sym-filler (ret (ℤ→ℤₕ (pos zero))) i j))
+ℤ→ℤₕ-predSuc (negsuc (suc n)) i j
+  = hcomp (λ k → λ { (j = i0) → ℤ→ℤₕ (negsuc (suc n))
+                   ; (i = i0) → lUnit (λ i → pred (sym (ret (ℤ→ℤₕ (negsuc n))) i)) k j
+                   ; (i = i1) → ℤ→ℤₕ (negsuc (suc n))
+                   ; (j = i1) → hoc (ℤ→ℤₕ (negsuc n)) k i
                    })
-          (pred (sym-filler (ret (ℤ-ℤₕ (negsuc n))) i j))
+  (pred (sym-filler (ret (ℤ→ℤₕ (negsuc n))) i j))
+\end{minted}
 
+To prove the 'ret' case, the following helper function is introcuded:
+\begin{minted}{agda}
+ℤ→ℤₕ-sucPred : (z : ℤ)
+              → Square (ℤ→ℤₕ-sucℤ (predℤ z) ∙ (λ j → succ (ℤ→ℤₕ-predℤ z j)))
+                       (λ _ → ℤ→ℤₕ z)
+                       (λ i → ℤ→ℤₕ (sucPred z i))
+                       (ret (ℤ→ℤₕ z))
+ℤ→ℤₕ-sucPred (pos zero) i j =
+  hcomp (λ k → λ { (j = i0) → ℤ→ℤₕ (pos zero)
+                 ; (i = i0) → rUnit (sym (ret (ℤ→ℤₕ (pos zero)))) k j
+                 ; (i = i1) → ℤ→ℤₕ (pos zero)
+                 ; (j = i1) → ret (ℤ→ℤₕ (pos zero)) i
+                 })
+        (sym-filler (ret (ℤ→ℤₕ (pos zero))) i j)
+ℤ→ℤₕ-sucPred (pos (suc n)) i j =
+  hcomp (λ k → λ { (j = i0) → succ (ℤ→ℤₕ (pos n))
+                 ; (i = i0) → lUnit (λ i → succ (sym (sec (ℤ→ℤₕ (pos n))) i)) k j
+                 ; (i = i1) → succ (ℤ→ℤₕ (pos n))
+                 ; (j = i1) → coh (ℤ→ℤₕ (pos n)) k i
+                 })
+        (succ (sym-filler (sec (ℤ→ℤₕ (pos n))) i j))
+ℤ→ℤₕ-sucPred (negsuc n) i j =
+  hcomp (λ k → λ { (j = i0) → ℤ→ℤₕ (negsuc n)
+                 ; (i = i0) → rUnit (sym (ret (ℤ→ℤₕ (negsuc n)))) k j
+                 ; (i = i1) → ℤ→ℤₕ (negsuc n)
+                 ; (j = i1) → ret (ℤ→ℤₕ (negsuc n)) i
+                 })
+        (sym-filler (ret (ℤ→ℤₕ (negsuc n))) i j)
+\end{minted}
+
+\begin{listing}[H]
+\begin{minted}{agda}
 ℤₕ-ℤ-ℤₕ zero          = refl
 ℤₕ-ℤ-ℤₕ (succ z)      = ℤ-ℤₕ-sucℤ (ℤₕ-ℤ z) ∙ (λ i → succ (ℤₕ-ℤ-ℤₕ z i))
 ℤₕ-ℤ-ℤₕ (pred z)      = ℤ-ℤₕ-predℤ (ℤₕ-ℤ z) ∙ (λ i → pred (ℤₕ-ℤ-ℤₕ z i))
 ℤₕ-ℤ-ℤₕ (sec z i) j   =
   hcomp (λ k → λ { (j = i0) → ℤ-ℤₕ (predSuc (ℤₕ-ℤ z) i)
                  ; (i = i0) → (ℤ-ℤₕ-predℤ (sucℤ (ℤₕ-ℤ z)) ∙ (λ i → pred (compPath-filler (ℤ-ℤₕ-sucℤ (ℤₕ-ℤ z))
-                     (λ i' → succ (ℤₕ-ℤ-ℤₕ z i'))
-                     k i))) j
+                   (λ i' → succ (ℤₕ-ℤ-ℤₕ z i'))
+                   k i))) j
                  ; (i = i1) → ℤₕ-ℤ-ℤₕ z (j ∧ k)
                  ; (j = i1) → sec (ℤₕ-ℤ-ℤₕ z k) i })
         (ℤ-ℤₕ-predSuc (ℤₕ-ℤ z) i j)
 ℤₕ-ℤ-ℤₕ (ret z i) j   =
   hcomp (λ k → λ { (j = i0) → ℤ-ℤₕ (sucPred (ℤₕ-ℤ z) i)
                  ; (i = i0) → (ℤ-ℤₕ-sucℤ (predℤ (ℤₕ-ℤ z)) ∙ (λ i → succ (compPath-filler (ℤ-ℤₕ-predℤ (ℤₕ-ℤ z))
-                     (congS pred (ℤₕ-ℤ-ℤₕ z))
-                     k i))) j
+                   (congS pred (ℤₕ-ℤ-ℤₕ z))
+                   k i))) j
                  ; (i = i1) → ℤₕ-ℤ-ℤₕ z (j ∧ k)
                  ; (j = i1) → ret (ℤₕ-ℤ-ℤₕ z k) i  })
         (ℤ-ℤₕ-sucPred (ℤₕ-ℤ z) i j)
-ℤₕ-ℤ-ℤₕ (coh z i j) k = ?
 \end{minted}
+\caption{Agda partial proof that converting HIT integers to standard integers and back results in the same value}
+\end{listing}
 
 \subsection{Set property}
 With these 4 functions defined, we can prove that our type is isomorphic with the standard definition:
