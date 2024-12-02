@@ -144,3 +144,8 @@ CommRingℤₕ*+ .IsCommRing.·Comm = *-comm
 \end{listing}
 
 With this defined, we can use this with the existing commutative ring solver tactic defined in the cubical library. What this essentially means is that any equation using only multiplication, addition and negation can be trivially solved. See the examples source file for an example of this.
+
+\section{Comparing Standard Integers and HIT Integers}
+When looking at the proof of the standard integers's commutative property of multiplication, the proof is 23 lines long (not including helper theorem proofs). Looking at the HIT integers's same proof, it is only 5 lines long (similarly not including any helper theorem proofs, but even if we include those, it is still less than 23 lines long). From this, we can confirm that the statement by Altenkirch \& Scoccola about standard integers being inconvenient as they cause a lot of unnecessary case distinctions is even more apparent when compared with our HIT integer definition and its proofs.
+
+As it was noted during the proof that HIT integers form a set, since we went the way of proving isomorphism with standard integers, we inadvertently compared our HIT integers and the standard integers. Unsurprisingly one expects all integer definitions to be isomoprhic, obviously they are going to be differences between definitions, each with their own pro and con (as mentioned in the Introduction chapter), in the end however, they should all be able to hold values which we associate with integer.
