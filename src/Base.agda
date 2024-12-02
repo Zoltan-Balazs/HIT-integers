@@ -46,76 +46,12 @@ hoc = com-op isHAℤₕ
 ℤₕ→ℤ (ret z i)   = sucPred (ℤₕ→ℤ z) i
 ℤₕ→ℤ (coh z i j) = cohℤ (ℤₕ→ℤ z) i j
 
-
-ℤ-ℤₕ-sucℤ : (z : ℤ) → ℤ-ℤₕ (sucℤ z) ≡ succ (ℤ-ℤₕ z)
-ℤ-ℤₕ-sucℤ (pos n) = refl
-ℤ-ℤₕ-sucℤ (negsuc zero) = sym (ret (ℤ-ℤₕ (pos zero)))
-ℤ-ℤₕ-sucℤ (negsuc (suc n)) = sym (ret (ℤ-ℤₕ (negsuc n)))
-
-ℤ-ℤₕ-predℤ : (z : ℤ) → ℤ-ℤₕ (predℤ z) ≡ pred (ℤ-ℤₕ z)
-ℤ-ℤₕ-predℤ (pos zero) = refl
-ℤ-ℤₕ-predℤ (pos (suc n)) = sym (sec (ℤ-ℤₕ (pos n)))
-ℤ-ℤₕ-predℤ (negsuc n) = refl
-
-sym-filler : ∀ {ℓ} {A : Type ℓ} {x y : A} (p : x ≡ y)
-                → Square (sym p)
-                         refl
-                         refl
-                         p
-sym-filler p i j = p (i ∨ ~ j)
-
-refl-square : ∀ {ℓ} {A : Type ℓ} {x : A} → Square {a₀₀ = x} refl refl refl refl
-refl-square = refl
-{-
-     101 y--------y 111
-        /|        /|
-       / |       / |
-   001x---------y011
-      |  |      |  |
-      |  |      |  |
-      100y---------y 110
-      | /       | /
-      |/        |/
-      y---------y
-   000          010
--}
-
-sym-filler-Cube : ∀ {ℓ} {A : Type ℓ} {x y : A}
-                    (p : x ≡ y)
-                    → Cube
-                      (sym-filler p)
-                      (refl-square {x = y})
-                      (sym-filler p)
-                      (refl-square {x = y})
-                      (refl-square {x = y})
-                      λ i j → p (i ∨ j)
-sym-filler-Cube {y = y} p i j k = p (i ∨ j ∨ ~ k)
-
-ℤ-ℤₕ-sucPred : (z : ℤ) → Square (ℤ-ℤₕ-sucℤ (predℤ z) ∙ (λ j → succ (ℤ-ℤₕ-predℤ z j)))
-                                (λ _ → ℤ-ℤₕ z)
-                                (λ i → ℤ-ℤₕ (sucPred z i))
-                                (ret (ℤ-ℤₕ z))
-ℤ-ℤₕ-sucPred (pos zero) i j =
-  hcomp (λ k → λ { (j = i0) → ℤ-ℤₕ (pos zero)
-                 ; (i = i0) → rUnit (sym (ret (ℤ-ℤₕ (pos zero)))) k j
-                 ; (i = i1) → ℤ-ℤₕ (pos zero)
-                 ; (j = i1) → ret (ℤ-ℤₕ (pos zero)) i
-                 })
-        (sym-filler (ret (ℤ-ℤₕ (pos zero))) i j)
-ℤ-ℤₕ-sucPred (pos (suc n)) i j =
-  hcomp (λ k → λ { (j = i0) → succ (ℤ-ℤₕ (pos n))
-                 ; (i = i0) → lUnit (λ i → succ (sym (sec (ℤ-ℤₕ (pos n))) i)) k j
-                 ; (i = i1) → succ (ℤ-ℤₕ (pos n))
-                 ; (j = i1) → coh (ℤ-ℤₕ (pos n)) k i
-                 })
-        (succ (sym-filler (sec (ℤ-ℤₕ (pos n))) i j))
-ℤ-ℤₕ-sucPred (negsuc n) i j =
-  hcomp (λ k → λ { (j = i0) → ℤ-ℤₕ (negsuc n)
-                 ; (i = i0) → rUnit (sym (ret (ℤ-ℤₕ (negsuc n)))) k j
-                 ; (i = i1) → ℤ-ℤₕ (negsuc n)
-                 ; (j = i1) → ret (ℤ-ℤₕ (negsuc n)) i
-                 })
-        (sym-filler (ret (ℤ-ℤₕ (negsuc n))) i j)
+-- Converting Standard Integers to HIT Integers
+ℤ→ℤₕ : ℤ → ℤₕ
+ℤ→ℤₕ (pos zero)       = zero
+ℤ→ℤₕ (pos (suc n))    = succ (ℤ→ℤₕ (pos n))
+ℤ→ℤₕ (negsuc zero)    = pred zero
+ℤ→ℤₕ (negsuc (suc n)) = pred (ℤ→ℤₕ (negsuc n))
 
 ℤ-ℤₕ-predSuc : (x : ℤ)
               → Square (ℤ-ℤₕ-predℤ (sucℤ x) ∙ (λ i → pred (ℤ-ℤₕ-sucℤ x i)))
