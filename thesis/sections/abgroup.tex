@@ -77,20 +77,51 @@ coh a i j + b = coh (a + b) i j
 \end{listing}
 
 \section{Identity Element}
-\begin{minted}[fontsize=\small]{agda}
+Before proving the existence of an identity element, we note that in the case of addition, both left and right identity element will be 0.
+\begin{theorem}
+  Left identity element exists for addition: ∃ id ∈ ℤ, ∀ z ∈ ℤ: id + z = z
+\end{theorem}
+
+\begin{proof}
+  In Agda, we will rewrite the statement as such: ∀ z ∈ ℤ → 0 + z = z, since we know that the identity element is 0.
+
+  The equation 0 + z = z is a reflection in Agda.
+\end{proof}
+
+\begin{listing}[H]
+\begin{minted}{agda}
 +-idˡ : ∀ z → zero + z ≡ z
 +-idˡ z = refl
+\end{minted}
+\caption{Agda proof of addition having a left identity element}
+\end{listing}
 
-+-zero : ∀ z → z + zero ≡ z
-+-zero = ℤₕ-ind-prop
+\begin{theorem}
+  Right identity element exists for addition: ∃ id ∈ ℤ, ∀ z ∈ ℤ: z + id = z
+\end{theorem}
+(Interesting note: the existence of a right identity element, more specifically the Agda rewritten version of 'z + zero = z' is a Peano axiom\cite{peano}.)
+
+\begin{proof}
+  As in the case of the left identity element, we will rewrite this statement in Agda as such: ∀ z ∈ ℤ → z + 0 = z. We will once again use our induction property for proving this in Agda.
+
+  For the base case (z = 0): 0 + 0 = 0 is a reflection.
+
+  For the succ case: (succ z) + 0 = succ z, since we have the original equality of z + 0 = z, it is enough to apply succ on both sides of the original equality.
+
+  For the pred case: (pred z) + 0 = pred z, similarly to the succ case, it is enough to apply pred on both sides of the original equality.
+\end{proof}
+
+\begin{listing}[H]
+\begin{minted}{agda}
++-idʳ : ∀ z → z + zero ≡ z
++-idʳ = ℤₕ-ind-prop
   (λ _ → isSetℤₕ _ _)
   refl
   (λ z p → cong succ p)
   (λ z p → cong pred p)
-
-+-idʳ : ∀ z → z + zero ≡ z
-+-idʳ = +-zero
 \end{minted}
+\caption{Agda proof of addition having a right identity element}
+\end{listing}
 
 \section{Negation and Subtraction}
 \begin{minted}[fontsize=\small]{agda}
