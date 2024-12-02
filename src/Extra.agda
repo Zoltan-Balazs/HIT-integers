@@ -1,23 +1,21 @@
 {-# OPTIONS --cubical --allow-unsolved-metas --allow-incomplete-matches #-}
 module Extra where
 
+open import Base
+open import Properties
+
 open import Agda.Builtin.FromNat
 open import Agda.Builtin.FromNeg
 open import Agda.Builtin.String
 
 open import Cubical.Data.Bool
-open import Cubical.Data.Nat
+open import Cubical.Data.Int hiding (_+_; -_)
+open import Cubical.Data.Nat hiding (_+_)
 
-open import Cubical.Foundations.Prelude renaming (_≡_ to _≡ᵖ_)
+open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.HLevels
 
-open HasFromNat public
-open HasFromNeg public
-
-open import Base
-open import Properties
-
--- Allow us to input numbers
+-- Allows us to input numbers
 private
   convert : ℕ → ℤₕ
   convert zero = zero
@@ -28,6 +26,33 @@ private
   convert-neg (suc n) = pred (convert-neg n)
 
 instance
+  fromNatℤₕ : HasFromNat ℤₕ
+  fromNatℤₕ = record { Constraint = λ _ → Unit ; fromNat = λ z → convert z }
+
+instance
+  fromNegℤₕ : HasFromNeg ℤₕ
+  fromNegℤₕ = record { Constraint = λ _ → Unit ; fromNeg = λ z → convert-neg z }
+
+-- Example for trivial proving with CommRing defined
+open import Cubical.Algebra.CommRing
+open import Cubical.Tactics.CommRingSolver
+
+module ProofNonTriv where
+  ℤₕCommRing : CommRing ℓ-zero
+  ℤₕCommRing .fst = ℤₕ
+  ℤₕCommRing .snd .CommRingStr.0r  = zero
+  ℤₕCommRing .snd .CommRingStr.1r  = succ zero
+  ℤₕCommRing .snd .CommRingStr._+_ = _+_
+  ℤₕCommRing .snd .CommRingStr._·_ = _*_
+  CommRingStr.- ℤₕCommRing .snd    = -_
+  ℤₕCommRing .snd .CommRingStr.isCommRing = CommRingℤₕ*+
+
+  open CommRingStr (ℤₕCommRing .snd) hiding (_+_)
+
+  -- Proof that [(m + n)² =] (m + n) * (m + n) = m * m + 2 * m * n + n * n [= (m² + 2 * m * n + n²)]
+  non-triv : (m n : ℤₕ) → (m + n) * (m + n) ≡ m * m + 2 * m * n + n * n
+  non-triv = solve! ℤₕCommRing
+
 -- Alternative definition that ℤₕ is a set
 record ℤ-algebra : Set₁ where
   field
