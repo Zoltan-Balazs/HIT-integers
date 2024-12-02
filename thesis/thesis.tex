@@ -11,7 +11,10 @@
 % See elteikthesis_minted.tex for example
 \usepackage[newfloat]{minted}
 \usepackage[utf8]{inputenc}
+\usepackage{tikz-cd}
 \removefromtoclist[float]{lol}
+
+\newcommand{\shorttextrightarrow}{\clipbox*{{.25\width} 0pt {\width} {\height}} \textrightarrow}
 
 \DeclareUnicodeCharacter{2124}{$\mathbb{Z}$}
 \DeclareUnicodeCharacter{2095}{$_h$}
@@ -21,6 +24,7 @@
 \DeclareUnicodeCharacter{03BB}{$\lambda$}
 \DeclareUnicodeCharacter{2243}{$\simeq$}
 \DeclareUnicodeCharacter{2080}{$_0$}
+\DeclareUnicodeCharacter{2081}{$_1$}
 \DeclareUnicodeCharacter{2115}{$\mathbb{N}$}
 \DeclareUnicodeCharacter{03A0}{$\Pi$}
 \DeclareUnicodeCharacter{02E1}{$^l$}
@@ -28,6 +32,9 @@
 \DeclareUnicodeCharacter{2219}{$\bullet$}
 \DeclareUnicodeCharacter{2228}{$\vee$}
 \DeclareUnicodeCharacter{2227}{$\wedge$}
+\DeclareUnicodeCharacter{22A2}{$\vdash$}
+\DeclareUnicodeCharacter{2208}{$\in$}
+\DeclareUnicodeCharacter{2203}{$\exists$}
 
 % Document's metadata
 \title{Integers as a Higher Inductive Type} % title
@@ -76,6 +83,9 @@
 \input{sections/intro.tex}
 \cleardoublepage
 
+\input{sections/indprin.tex}
+\cleardoublepage
+
 \input{sections/set.tex}
 \cleardoublepage
 
@@ -91,22 +101,15 @@
 \input{sections/further.tex}
 \cleardoublepage
 
+\chapter*{\acklabel}
+\addcontentsline{toc}{chapter}{\acklabel}
+I want to thank the Budapest Type Theory Group, especially Viktor Bense, Szumi Xie, Márton Petes, and my supervisor, Ambrus Kaposi, for helping me by answering any of my questions regarding my thesis work and for making it possible for me to finish it.
+I would also like to thank my mother, who has supported me through my university years.
+
 % Bibliography (mandatory)
 \phantomsection
 \addcontentsline{toc}{chapter}{\biblabel}
 \printbibliography[title=\biblabel]
-\cleardoublepage
-
-% List of figures (optional) - useful over 3-5 figures
-\phantomsection
-\addcontentsline{toc}{chapter}{\lstfigurelabel}
-\listoffigures
-\cleardoublepage
-
-% List of tables (optional) - useful over 3-5 tables
-\phantomsection
-\addcontentsline{toc}{chapter}{\lsttablelabel}
-\listoftables
 \cleardoublepage
 
 % List of codes (optional) - useful over 3-5 code samples
