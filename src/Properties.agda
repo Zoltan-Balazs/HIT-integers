@@ -220,6 +220,11 @@ inv-hom-ℤₕ = ℤₕ-ind-prop
   (λ m p n → cong pred (p n))
   (λ m p n → cong succ (p n))
 
+-- Multiplication and its properties
+-- Definitionally the following hold true for multiplication:
+-- zero   * n = zero
+-- succ m * n = n + m * n
+-- pred n * n = (- n) + m * n
 Iso-n+-ℤₕ : (z : ℤₕ) → Iso ℤₕ ℤₕ
 Iso.fun (Iso-n+-ℤₕ z) = z +_
 Iso.inv (Iso-n+-ℤₕ z) = - z +_
