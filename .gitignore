@@ -3,6 +3,8 @@ references/
 
 thesis/*
 thesis/images/*.pdf
+!thesis/defense/
+thesis/defense/*
 !thesis/defense/defense.pdf
 !thesis/defense/defense.tex
 !thesis/topicdeclaration.pdf

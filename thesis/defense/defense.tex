@@ -1,0 +1,106 @@
+\documentclass[14pt, aspectratio=1610]{beamer}
+\usetheme{CambridgeUS}
+\usepackage{xcolor}
+\usepackage[newfloat]{minted}
+\usemintedstyle{manni}
+\usepackage[utf8]{inputenc}
+\usepackage[magyar]{babel}
+\usepackage{listings}
+% \setbeamertemplate{navigation symbols}{}
+\setbeamercovered{transparent}
+
+\DeclareUnicodeCharacter{2124}{$\mathbb{Z}$}
+\DeclareUnicodeCharacter{2095}{$_h$}
+\DeclareUnicodeCharacter{2261}{$\equiv$}
+
+\title{HIT egész számok kommutatív gyűrűt alkotnak}
+\institute{Eötvös Loránd Tudományegyetem}
+\author{Balázs Zoltán}
+\date{\today}
+
+\setminted{
+   frame=lines,
+   framesep=2mm,
+   baselinestretch=1.2,
+   fontsize=\footnotesize,
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}[fragile]{Egész szám definíciók}
+
+\begin{itemize}
+    \item<+-> Normálforma (\texttt{zero}, \texttt{suc}, \texttt{pred})
+    \item<+-> Jobb normálforma (\texttt{pos}, \texttt{negsuc})
+    \item<+-> Bi-Invertible (\texttt{zero}, \texttt{suc}, \texttt{predr}, \texttt{suc-predr}, \texttt{predl}, \texttt{predl-suc}, \texttt{predl≡predr})
+    \item<+-> HIT (\texttt{zero}, \texttt{suc}, \texttt{pred}, \texttt{suc-pred}, \texttt{pred-suc}, \texttt{coh})
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Kommutatív gyűrű}
+
+\begin{itemize}
+    \item<+-> A halmaz, összeadás és szorzás gyűrűt alkot
+      \begin{itemize}
+        \item<+-> A halmaz és összeadás Abel-csoportot alkot
+          \begin{itemize}
+            \item<+-> Összeadás egységeleme létezik
+            \item<+-> Összeadás inverz eleme létezik
+            \item<+-> Összeadás asszociatív
+            \item<+-> Összeadás kommutatív
+          \end{itemize}
+        \item<+-> A halmaz és szorzás monoid
+          \begin{itemize}
+            \item<+-> Szorzás egységeleme létezik
+            \item<+-> Szorzás asszociatív
+          \end{itemize}
+        \item<+-> A szorzás disztributív az összeadásra
+      \end{itemize}
+    \item<+-> Szorzás kommutatív
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Implementáció menete}
+
+\begin{minted}{agda}
+data ℤₕ : Set where
+  zero : ℤₕ
+  succ : ℤₕ → ℤₕ
+  pred : ℤₕ → ℤₕ
+  sec : (z : ℤₕ) → pred (succ z) ≡ z
+  ret : (z : ℤₕ) → succ (pred z) ≡ z
+  coh : (z : ℤₕ) → congS succ (sec z) ≡ ret (succ z)
+\end{minted}
+
+\begin{itemize}
+    \item<+-> Halmaz definiálása
+    \item<+-> Izomorfizmus a normálforma definícióval
+    \item<+-> Iterátor (+eliminátor) és induktív tulajdonság
+    \item<+-> Műveletek (és tulajdonságok) Agda-ban való definiálása (és formalizálása)
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Ez miért új? Mi a haszna?}
+
+\begin{itemize}
+    \item<+-> Eddig csak elméleti síkon volt belátva
+    \item<+-> Eliminálhatunk magasabb dimenziókra (halmazok felé, pl. groupoidokra)
+    \item<+-> Szebb definíció mint a Bi-Invertible egész számok
+    \item<+-> Az egész számok tényleg kommutatív gyűrűt alkotnak
+    \item<+-> Automatikus levezetés összeadást, negálást (kivonást) és szorzást használó egyenlőségekre
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[plain]
+  \centering
+  \Huge
+  Köszönöm a figyelmet!
+\end{frame}
+
+\end{document}
