@@ -13,7 +13,7 @@
 \DeclareUnicodeCharacter{2095}{$_h$}
 \DeclareUnicodeCharacter{2261}{$\equiv$}
 
-\title{HIT egész számok kommutatív gyűrűt alkotnak}
+\title{Egész számok definiálása HIT-kkel koherencia szabállyal és Kommutatív gyűrű tulajdonság formalizálása}
 \institute{Eötvös Loránd Tudományegyetem}
 \author{Balázs Zoltán}
 \date{\today}
@@ -31,42 +31,47 @@
 
 \begin{frame}[fragile]{Egész szám definíciók}
 
-\begin{itemize}
-    \item<+-> Normálforma (\texttt{zero}, \texttt{suc}, \texttt{pred})
-    \item<+-> Jobb normálforma (\texttt{pos}, \texttt{negsuc})
-    \item<+-> Bi-Invertible (\texttt{zero}, \texttt{suc}, \texttt{predr}, \texttt{suc-predr}, \texttt{predl}, \texttt{predl-suc}, \texttt{predl≡predr})
-    \item<+-> HIT (\texttt{zero}, \texttt{suc}, \texttt{pred}, \texttt{suc-pred}, \texttt{pred-suc}, \texttt{coh})
+\begin{itemize}[<+->]
+  \item Normálforma (\texttt{zero}, \texttt{suc}, \texttt{pred} - Agda-ban \texttt{pos}, \texttt{negsuc}): pred (succ z) = ?
+  \item HIT
+    \begin{itemize}[<+->]
+      \item Bi-Invertible (\texttt{zero}, \texttt{suc}, \texttt{predr}, \texttt{suc-predr}, \texttt{predl}, \texttt{predl-suc}) \texttt{predl≡predr} kell!
+      \item Koherencia szabállyal (\texttt{zero}, \texttt{suc}, \texttt{pred}, \texttt{suc-pred}, \texttt{pred-suc}, \texttt{coh})
+    \end{itemize}
 \end{itemize}
 
 \end{frame}
 
 \begin{frame}[fragile]{Kommutatív gyűrű}
 
-\begin{itemize}
-    \item<+-> A halmaz, összeadás és szorzás gyűrűt alkot
-      \begin{itemize}
-        \item<+-> A halmaz és összeadás Abel-csoportot alkot
-          \begin{itemize}
-            \item<+-> Összeadás egységeleme létezik
-            \item<+-> Összeadás inverz eleme létezik
-            \item<+-> Összeadás asszociatív
-            \item<+-> Összeadás kommutatív
+\begin{itemize}[<+->]
+    \item Az egész számok, összeadás és szorzás gyűrűt alkotnak
+      \begin{itemize}[<+->]
+        \item Az egész számok és összeadás Abel-csoportot alkotnak
+          \begin{itemize}[<+->]
+            \item Összeadás egységeleme létezik
+            \item Összeadás inverz eleme létezik
+            \item Összeadás asszociatív
+            \item Összeadás kommutatív
           \end{itemize}
-        \item<+-> A halmaz és szorzás monoid
-          \begin{itemize}
-            \item<+-> Szorzás egységeleme létezik
-            \item<+-> Szorzás asszociatív
+        \item Az egész számok és szorzás egységelemes félcsoportot alkotnak
+          \begin{itemize}[<+->]
+            \item Szorzás egységeleme létezik
+            \item Szorzás asszociatív
           \end{itemize}
-        \item<+-> A szorzás disztributív az összeadásra
+        \item A szorzás disztributív az összeadás felett
       \end{itemize}
-    \item<+-> Szorzás kommutatív
+    \item Szorzás kommutatív
 \end{itemize}
 
 \end{frame}
 
 \begin{frame}[fragile]{Implementáció menete}
 
-\begin{minted}{agda}
+\begin{itemize}[<+->]
+  \item Egész számok definiálása
+    \begin{onlyenv}<.>
+    \begin{minted}{agda}
 data ℤₕ : Set where
   zero : ℤₕ
   succ : ℤₕ → ℤₕ
@@ -74,25 +79,34 @@ data ℤₕ : Set where
   sec : (z : ℤₕ) → pred (succ z) ≡ z
   ret : (z : ℤₕ) → succ (pred z) ≡ z
   coh : (z : ℤₕ) → congS succ (sec z) ≡ ret (succ z)
-\end{minted}
-
-\begin{itemize}
-    \item<+-> Halmaz definiálása
-    \item<+-> Izomorfizmus a normálforma definícióval
-    \item<+-> Iterátor (+eliminátor) és induktív tulajdonság
-    \item<+-> Műveletek (és tulajdonságok) Agda-ban való definiálása (és formalizálása)
+    \end{minted}
+    \end{onlyenv}
+  \item Izomorfizmus a normálforma definícióval
+    \begin{onlyenv}<.>
+    \begin{minted}{agda}
+ℤ-iso : Iso ℤ ℤₕ
+ℤ-iso .Iso.fun      = ℤ→ℤₕ
+ℤ-iso .Iso.inv      = ℤₕ→ℤ
+ℤ-iso .Iso.rightInv = ℤₕ→ℤ→ℤₕ
+ℤ-iso .Iso.leftInv  = ℤ→ℤₕ→ℤ
+    \end{minted}
+    \end{onlyenv}
+  \item Iterátor (+eliminátor) és induktív tulajdonság
+  \item Műveletek definiálása
+  \item Tulajdonságok formalizálása
 \end{itemize}
 
 \end{frame}
 
 \begin{frame}{Ez miért új? Mi a haszna?}
 
-\begin{itemize}
-    \item<+-> Eddig csak elméleti síkon volt belátva
-    \item<+-> Eliminálhatunk magasabb dimenziókra (halmazok felé, pl. groupoidokra)
-    \item<+-> Szebb definíció mint a Bi-Invertible egész számok
-    \item<+-> Az egész számok tényleg kommutatív gyűrűt alkotnak
-    \item<+-> Automatikus levezetés összeadást, negálást (kivonást) és szorzást használó egyenlőségekre
+\begin{itemize}[<+->]
+    \item Az egész számok tényleg kommutatív gyűrűt alkotnak
+    \item Egyszerűbb bebizonyítani tulajdonságokat mint a normálforma definícióval
+    \item Kézenfoghatóbb HIT definíció mint a Bi-Invertible
+    \item Automatikus levezetés összeadást, negálást (kivonást) és szorzást használó egyenlőségekre
+    \item Eddig csak elméleti síkon volt belátva
+    \item Eliminálhatunk magasabb univerzumba (típusok, Girard paradox, Russel paradox, System U)
 \end{itemize}
 
 \end{frame}
